@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 إدارة الحظائر</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="frame">
+            <h1 class="title">🏠 إدارة الحظائر</h1>
+
+            <button class="back-btn" onclick="goBack()">⬅ الرجوع</button>
+
+            <div class="stats-frame">
+                <div class="stat-item" id="totalBarns">عدد الحظائر: 0</div>
+                <div class="stat-item" id="totalAnimals">إجمالي الحيوانات: 0</div>
+            </div>
+
+            <div class="fields-frame">
+                <div class="grid-container">
+                    <!-- الصف 0 -->
+                    <label for="barnNumber" class="field-label">رقم الحظيرة</label>
+                    <input type="text" id="barnNumber" class="field-input" readonly>
+
+                    <label for="lastBarnUsed" class="field-label">الحظيرة المستخدمة أخيراً</label>
+                    <input type="text" id="lastBarnUsed" class="field-input" readonly>
+
+                    <label for="barnName" class="field-label">اسم الحظيرة</label>
+                    <input type="text" id="barnName" class="field-input">
+
+                    <!-- الصف 1 -->
+                    <label for="purchaseDate" class="field-label">تاريخ الشراء</label>
+                    <input type="date" id="purchaseDate" class="field-input">
+
+                    <label for="capacity" class="field-label">الاستيعاب</label>
+                    <input type="number" id="capacity" class="field-input" min="0" max="10000">
+
+                    <label for="animalType" class="field-label">الصنف</label>
+                    <select id="animalType" class="field-input">
+                        <option value="أغنام">أغنام</option>
+                        <option value="أبقار">أبقار</option>
+                        <option value="ماعز">ماعز</option>
+                        <option value="خراف">خراف</option>
+                        <option value="جمال">جمال</option>
+                    </select>
+
+                    <label for="dayMonth" class="field-label">اليوم/الشهر</label>
+                    <select id="dayMonth" class="field-input">
+                        <!-- سيتم ملؤها بـ 1 إلى 31 -->
+                    </select>
+
+                    <label for="gender" class="field-label">النوع</label>
+                    <select id="gender" class="field-input">
+                        <!-- سيتم ملؤها ديناميكيًا -->
+                    </select>
+
+                    <!-- الصف 2 -->
+                    <label for="location" class="field-label">الموقع</label>
+                    <input type="text" id="location" class="field-input">
+
+                    <label for="totalPrice" class="field-label">إجمالي السعر</label>
+                    <input type="number" id="totalPrice" class="field-input" min="0" max="1000000">
+
+                    <label for="maleQty" class="field-label">كمية ذكور</label>
+                    <input type="number" id="maleQty" class="field-input" min="0" max="1000">
+
+                    <label for="femaleQty" class="field-label">كمية إناث</label>
+                    <input type="number" id="femaleQty" class="field-input" min="0" max="1000">
+
+                    <!-- الصف 3 -->
+                    <label for="unitPrice" class="field-label">السعر الفردي</label>
+                    <input type="number" id="unitPrice" class="field-input" min="0" max="100000">
+
+                    <label for="totalCost" class="field-label">الإجمالي</label>
+                    <input type="number" id="totalCost" class="field-input" min="0" max="1000000" readonly>
+                </div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn btn-delete" onclick="deleteBarn()">حذف</button>
+                <button class="btn btn-new" onclick="clearFields()">جديد</button>
+                <button class="btn btn-save" onclick="saveBarn()">حفظ</button>
+                <button class="btn btn-view" onclick="loadData()">عرض بيانات</button>
+            </div>
+
+            <div class="table-frame">
+                <table id="barnsTable">
+                    <thead>
+                        <tr>
+                            <th>رقم الحظيرة</th>
+                            <th>الحظيرة المستخدمة أخيراً</th>
+                            <th>اسم الحظيرة</th>
+                            <th>تاريخ الشراء</th>
+                            <th>الاستيعاب</th>
+                            <th>الصنف</th>
+                            <th>اليوم/الشهر</th>
+                            <th>النوع</th>
+                            <th>الموقع</th>
+                            <th>إجمالي السعر</th>
+                            <th>كمية ذكور</th>
+                            <th>كمية إناث</th>
+                            <th>السعر الفردي</th>
+                            <th>الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- سيتم ملؤها بالبيانات -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
