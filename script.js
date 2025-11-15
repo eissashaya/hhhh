@@ -8,11 +8,61 @@ const animalTypesMapping = {
 };
 
 let selectedId = null;
+let barns = [];
+
+// دالة تحويل التاريخ الميلادي إلى هجري
+function convertToHijri(gregorianDate) {
+    try {
+        const date = new Date(gregorianDate);
+        const hijriDate = new HijriDate(date);
+        return hijriDate.toString('yyyy/mm/dd');
+    } catch (error) {
+        console.error('خطأ في تحويل التاريخ:', error);
+        return '---/--/--';
+    }
+}
+
+// دالة تحويل التاريخ الهجري إلى ميلادي
+function convertToGregorian(hijriDateStr) {
+    try {
+        const [year, month, day] = hijriDateStr.split('/').map(Number);
+        const hijriDate = new HijriDate(year, month - 1, day);
+        return hijriDate.toGregorian().toISOString().split('T')[0];
+    } catch (error) {
+        console.error('خطأ في تحويل التاريخ:', error);
+        return new Date().toISOString().split('T')[0];
+    }
+}
+
+// دالة تحديث التاريخ الهجري تلقائياً عند تغيير الميلادي
+function updateHijriDate() {
+    const gregorianDate = document.getElementById('purchaseDate').value;
+    if (gregorianDate) {
+        const hijriDate = convertToHijri(gregorianDate);
+        document.getElementById('purchaseDateHijri').value = hijriDate;
+    }
+}
+
+// دالة تحديث اليوم والشهر تلقائياً
+function updateDayMonth() {
+    const gregorianDate = document.getElementById('purchaseDate').value;
+    if (gregorianDate) {
+        const date = new Date(gregorianDate);
+        const day = date.getDate();
+        document.getElementById('dayMonth').value = day;
+    }
+}
 
 // عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
     // تعيين تاريخ اليوم كتاريخ شراء افتراضي
-    document.getElementById('purchaseDate').valueAsDate = new Date();
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+    document.getElementById('purchaseDate').value = todayFormatted;
+    
+    // تحديث التاريخ الهجري واليوم تلقائياً
+    updateHijriDate();
+    updateDayMonth();
 
     // ملء أيام الشهر (1-31)
     const dayMonthSelect = document.getElementById('dayMonth');
@@ -25,6 +75,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // التوصيلات للأحداث
     document.getElementById('animalType').addEventListener('change', updateAnimalTypes);
+    document.getElementById('purchaseDate').addEventListener('change', function() {
+        updateHijriDate();
+        updateDayMonth();
+    });
+    
+    // أحداث الحسابات التلقائية
     document.getElementById('unitPrice').addEventListener('input', calculateTotalCost);
     document.getElementById('maleQty').addEventListener('input', calculateTotalCost);
     document.getElementById('femaleQty').addEventListener('input', calculateTotalCost);
@@ -67,15 +123,10 @@ function updateAnimalTypes() {
 function setAutoBarnNumber() {
     const nextNumber = getNextBarnNumber();
     document.getElementById('barnNumber').value = nextNumber;
-
-    // تعيين آخر حظيرة مستخدمة
-    const lastBarn = getLastBarnUsed();
-    document.getElementById('lastBarnUsed').value = lastBarn ? lastBarn : "لا توجد";
 }
 
 // الحصول على آخر رقم حظيرة وإنشاء الرقم التالي
 function getNextBarnNumber() {
-    const barns = getBarns();
     if (barns.length > 0) {
         const lastBarn = barns[barns.length - 1];
         return (parseInt(lastBarn.رقم_الحظيرة) + 1).toString();
@@ -83,27 +134,12 @@ function getNextBarnNumber() {
     return "1";
 }
 
-// الحصول على آخر حظيرة مستخدمة
-function getLastBarnUsed() {
-    const barns = getBarns();
-    if (barns.length > 0) {
-        return barns[barns.length - 1].اسم_الحظيرة;
-    }
-    return "";
-}
-
 // دالة تحديث الكميات الإجمالية
 function updateTotalQuantity() {
     const maleQty = parseInt(document.getElementById('maleQty').value) || 0;
     const femaleQty = parseInt(document.getElementById('femaleQty').value) || 0;
     const totalAnimals = maleQty + femaleQty;
-
-    // تحديث حقل الاستيعاب تلقائياً إذا كان فارغاً أو 0
-    const capacity = document.getElementById('capacity');
-    const currentCapacity = parseInt(capacity.value) || 0;
-    if (currentCapacity === 0 || currentCapacity < totalAnimals) {
-        capacity.value = totalAnimals;
-    }
+    document.getElementById('totalQuantity').value = totalAnimals;
 }
 
 // دالة الحساب التلقائي للإجمالي
@@ -111,15 +147,18 @@ function calculateTotalCost() {
     const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
     const maleQty = parseInt(document.getElementById('maleQty').value) || 0;
     const femaleQty = parseInt(document.getElementById('femaleQty').value) || 0;
-    const total = unitPrice * (maleQty + femaleQty);
+    const totalAnimals = maleQty + femaleQty;
+    const total = unitPrice * totalAnimals;
     document.getElementById('totalCost').value = total;
+    
+    // تحديث المجموع أيضاً
+    document.getElementById('totalQuantity').value = totalAnimals;
 }
 
 // دالة تحديث الإحصائيات
 function updateStatistics() {
-    const barns = getBarns();
     const totalBarns = barns.length;
-    const totalAnimals = barns.reduce((sum, barn) => sum + (barn.كمية_ذكور + barn.كمية_إناث), 0);
+    const totalAnimals = barns.reduce((sum, barn) => sum + (parseInt(barn.المجموع) || 0), 0);
 
     document.getElementById('totalBarns').textContent = `عدد الحظائر: ${totalBarns}`;
     document.getElementById('totalAnimals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
@@ -127,37 +166,51 @@ function updateStatistics() {
 
 // دالة الرجوع
 function goBack() {
-    // يمكن تعديل هذه الدالة حسب الحاجة (مثلاً: الرجوع للصفحة الرئيسية)
-    alert("وظيفة الرجوع - يمكن ربطها بالصفحة الرئيسية");
+    if (confirm("هل تريد الرجوع إلى الصفحة الرئيسية؟")) {
+        // يمكن تعديل هذه الدالة حسب الحاجة (مثلاً: الرجوع للصفحة الرئيسية)
+        window.location.href = "index.html";
+    }
 }
 
 // دوال localStorage (بديل قاعدة البيانات)
-function getBarns() {
-    const barns = localStorage.getItem('barns');
-    return barns ? JSON.parse(barns) : [];
+function getBarnsFromStorage() {
+    const barnsData = localStorage.getItem('barns');
+    return barnsData ? JSON.parse(barnsData) : [];
 }
 
-function saveBarns(barns) {
-    localStorage.setItem('barns', JSON.stringify(barns));
+function saveBarnsToStorage(barnsData) {
+    localStorage.setItem('barns', JSON.stringify(barnsData));
 }
 
 // دوال العمليات
 function clearFields() {
+    document.getElementById('barnNumber').value = '';
     document.getElementById('barnName').value = '';
-    document.getElementById('purchaseDate').valueAsDate = new Date();
-    document.getElementById('capacity').value = '';
+    
+    // تعيين تاريخ اليوم
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+    document.getElementById('purchaseDate').value = todayFormatted;
+    updateHijriDate();
+    updateDayMonth();
+    
     document.getElementById('animalType').selectedIndex = 0;
-    document.getElementById('dayMonth').selectedIndex = 0;
     document.getElementById('gender').selectedIndex = 0;
+    document.getElementById('maleQty').value = '0';
+    document.getElementById('femaleQty').value = '0';
+    document.getElementById('totalQuantity').value = '0';
+    document.getElementById('dayMonth').selectedIndex = 0;
     document.getElementById('location').value = '';
-    document.getElementById('totalPrice').value = '';
-    document.getElementById('maleQty').value = '';
-    document.getElementById('femaleQty').value = '';
-    document.getElementById('unitPrice').value = '';
-    document.getElementById('totalCost').value = '';
+    document.getElementById('totalPrice').value = '0';
+    document.getElementById('unitPrice').value = '0';
+    document.getElementById('totalCost').value = '0';
 
     selectedId = null;
     setAutoBarnNumber();
+    
+    // إزالة التحديد من الجدول
+    const selectedRows = document.querySelectorAll('#tableBody tr.selected');
+    selectedRows.forEach(row => row.classList.remove('selected'));
 }
 
 function saveBarn() {
@@ -176,34 +229,35 @@ function saveBarn() {
 
     const barn = {
         رقم_الحظيرة: document.getElementById('barnNumber').value,
-        الحظيرة_المستخدمة_أخيرا: document.getElementById('lastBarnUsed').value,
         اسم_الحظيرة: barnName,
         تاريخ_الشراء: document.getElementById('purchaseDate').value,
-        الاستيعاب: parseInt(document.getElementById('capacity').value) || 0,
+        تاريخ_الشراء_هجري: document.getElementById('purchaseDateHijri').value,
         الصنف: document.getElementById('animalType').value,
-        اليوم_الشهر: parseInt(document.getElementById('dayMonth').value),
         النوع: document.getElementById('gender').value,
-        الموقع: document.getElementById('location').value,
-        إجمالي_السعر: parseInt(document.getElementById('totalPrice').value) || 0,
         كمية_ذكور: maleQty,
         كمية_إناث: femaleQty,
+        المجموع: parseInt(document.getElementById('totalQuantity').value) || 0,
+        اليوم_الشهر: parseInt(document.getElementById('dayMonth').value),
+        الموقع: document.getElementById('location').value,
+        إجمالي_السعر: parseInt(document.getElementById('totalPrice').value) || 0,
         السعر_الفردي: parseInt(document.getElementById('unitPrice').value) || 0,
         الإجمالي: parseInt(document.getElementById('totalCost').value) || 0
     };
 
-    let barns = getBarns();
+    barns = getBarnsFromStorage();
+    
     if (selectedId) {
         // تحديث الحظيرة الموجودة
         barns = barns.map(b => b.id === selectedId ? { ...barn, id: selectedId } : b);
         alert("تم تحديث الحظيرة بنجاح!");
     } else {
         // إضافة حظيرة جديدة
-        barn.id = Date.now().toString(); // استخدام الطابع الزمني كمعرف فريد
+        barn.id = Date.now().toString();
         barns.push(barn);
         alert("تم إضافة الحظيرة بنجاح!");
     }
 
-    saveBarns(barns);
+    saveBarnsToStorage(barns);
     clearFields();
     loadData();
     updateStatistics();
@@ -216,9 +270,9 @@ function deleteBarn() {
     }
 
     if (confirm("هل تريد حذف الحظيرة؟")) {
-        let barns = getBarns();
+        barns = getBarnsFromStorage();
         barns = barns.filter(b => b.id !== selectedId);
-        saveBarns(barns);
+        saveBarnsToStorage(barns);
         alert("تم حذف الحظيرة!");
         clearFields();
         loadData();
@@ -227,45 +281,68 @@ function deleteBarn() {
 }
 
 function loadData() {
-    const barns = getBarns();
+    barns = getBarnsFromStorage();
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = '';
 
     barns.forEach(barn => {
         const row = tableBody.insertRow();
-        row.onclick = () => loadSelectedRow(barn);
+        row.dataset.id = barn.id;
+        
+        // إضافة حدث النقر لتحميل البيانات في الحقول
+        row.onclick = function() {
+            // إزالة التحديد من جميع الصفوف
+            const allRows = document.querySelectorAll('#tableBody tr');
+            allRows.forEach(r => r.classList.remove('selected'));
+            
+            // تحديد الصف الحالي
+            this.classList.add('selected');
+            
+            // تحميل البيانات في الحقول
+            loadSelectedRow(barn);
+        };
 
-        row.insertCell(0).textContent = barn.رقم_الحظيرة;
-        row.insertCell(1).textContent = barn.الحظيرة_المستخدمة_أخيرا;
-        row.insertCell(2).textContent = barn.اسم_الحظيرة;
-        row.insertCell(3).textContent = barn.تاريخ_الشراء;
-        row.insertCell(4).textContent = barn.الاستيعاب;
-        row.insertCell(5).textContent = barn.الصنف;
-        row.insertCell(6).textContent = barn.اليوم_الشهر;
-        row.insertCell(7).textContent = barn.النوع;
-        row.insertCell(8).textContent = barn.الموقع;
-        row.insertCell(9).textContent = barn.إجمالي_السعر;
-        row.insertCell(10).textContent = barn.كمية_ذكور;
-        row.insertCell(11).textContent = barn.كمية_إناث;
-        row.insertCell(12).textContent = barn.السعر_الفردي;
-        row.insertCell(13).textContent = barn.الإجمالي;
+        // إضافة البيانات إلى الصف
+        const fields = [
+            barn.رقم_الحظيرة,
+            barn.اسم_الحظيرة,
+            barn.تاريخ_الشراء,
+            barn.تاريخ_الشراء_هجري,
+            barn.الصنف,
+            barn.النوع,
+            barn.كمية_ذكور,
+            barn.كمية_إناث,
+            barn.المجموع,
+            barn.اليوم_الشهر,
+            barn.الموقع,
+            barn.السعر_الفردي,
+            barn.إجمالي_السعر,
+            barn.الإجمالي
+        ];
+        
+        fields.forEach(field => {
+            const cell = row.insertCell();
+            cell.textContent = field;
+        });
     });
+    
+    updateStatistics();
 }
 
 function loadSelectedRow(barn) {
     selectedId = barn.id;
     document.getElementById('barnNumber').value = barn.رقم_الحظيرة;
-    document.getElementById('lastBarnUsed').value = barn.الحظيرة_المستخدمة_أخيرا;
     document.getElementById('barnName').value = barn.اسم_الحظيرة;
     document.getElementById('purchaseDate').value = barn.تاريخ_الشراء;
-    document.getElementById('capacity').value = barn.الاستيعاب;
+    document.getElementById('purchaseDateHijri').value = barn.تاريخ_الشراء_هجري;
     document.getElementById('animalType').value = barn.الصنف;
-    document.getElementById('dayMonth').value = barn.اليوم_الشهر;
     document.getElementById('gender').value = barn.النوع;
-    document.getElementById('location').value = barn.الموقع;
-    document.getElementById('totalPrice').value = barn.إجمالي_السعر;
     document.getElementById('maleQty').value = barn.كمية_ذكور;
     document.getElementById('femaleQty').value = barn.كمية_إناث;
+    document.getElementById('totalQuantity').value = barn.المجموع;
+    document.getElementById('dayMonth').value = barn.اليوم_الشهر;
+    document.getElementById('location').value = barn.الموقع;
+    document.getElementById('totalPrice').value = barn.إجمالي_السعر;
     document.getElementById('unitPrice').value = barn.السعر_الفردي;
     document.getElementById('totalCost').value = barn.الإجمالي;
 }

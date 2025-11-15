@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏠 إدارة الحظائر</title>
     <link rel="stylesheet" href="style.css">
+    <!-- مكتبة التواريخ الهجرية -->
+    <script src="https://cdn.jsdelivr.net/npm/hijri-date/lib/hijri-date.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -20,23 +22,14 @@
 
             <div class="fields-frame">
                 <div class="grid-container">
-                    <!-- الصف 0 -->
+                    <!-- الصف 0: رقم الحظيرة، اسم الحظيرة -->
                     <label for="barnNumber" class="field-label">رقم الحظيرة</label>
                     <input type="text" id="barnNumber" class="field-input" readonly>
-
-                    <label for="lastBarnUsed" class="field-label">الحظيرة المستخدمة أخيراً</label>
-                    <input type="text" id="lastBarnUsed" class="field-input" readonly>
 
                     <label for="barnName" class="field-label">اسم الحظيرة</label>
                     <input type="text" id="barnName" class="field-input">
 
-                    <!-- الصف 1 -->
-                    <label for="purchaseDate" class="field-label">تاريخ الشراء</label>
-                    <input type="date" id="purchaseDate" class="field-input">
-
-                    <label for="capacity" class="field-label">الاستيعاب</label>
-                    <input type="number" id="capacity" class="field-input" min="0" max="10000">
-
+                    <!-- الصف 1: الصنف، النوع -->
                     <label for="animalType" class="field-label">الصنف</label>
                     <select id="animalType" class="field-input">
                         <option value="أغنام">أغنام</option>
@@ -46,32 +39,42 @@
                         <option value="جمال">جمال</option>
                     </select>
 
-                    <label for="dayMonth" class="field-label">اليوم/الشهر</label>
-                    <select id="dayMonth" class="field-input">
-                        <!-- سيتم ملؤها بـ 1 إلى 31 -->
-                    </select>
-
                     <label for="gender" class="field-label">النوع</label>
                     <select id="gender" class="field-input">
                         <!-- سيتم ملؤها ديناميكيًا -->
                     </select>
 
-                    <!-- الصف 2 -->
+                    <!-- الصف 2: كمية ذكور، كمية إناث، المجموع -->
+                    <label for="maleQty" class="field-label">كمية ذكور</label>
+                    <input type="number" id="maleQty" class="field-input" min="0" max="1000" value="0">
+
+                    <label for="femaleQty" class="field-label">كمية إناث</label>
+                    <input type="number" id="femaleQty" class="field-input" min="0" max="1000" value="0">
+
+                    <label for="totalQuantity" class="field-label">المجموع</label>
+                    <input type="number" id="totalQuantity" class="field-input" readonly>
+
+                    <!-- الصف 3: تاريخ الشراء (ميلادي وهجري) -->
+                    <label for="purchaseDate" class="field-label">تاريخ الشراء (ميلادي)</label>
+                    <input type="date" id="purchaseDate" class="field-input">
+
+                    <label for="purchaseDateHijri" class="field-label">تاريخ الشراء (هجري)</label>
+                    <input type="text" id="purchaseDateHijri" class="field-input" readonly>
+
+                    <label for="dayMonth" class="field-label">اليوم/الشهر</label>
+                    <select id="dayMonth" class="field-input">
+                        <!-- سيتم ملؤها بـ 1 إلى 31 -->
+                    </select>
+
                     <label for="location" class="field-label">الموقع</label>
                     <input type="text" id="location" class="field-input">
 
+                    <!-- الصف 4: السعر الفردي، إجمالي السعر، الإجمالي -->
+                    <label for="unitPrice" class="field-label">السعر الفردي (شراء)</label>
+                    <input type="number" id="unitPrice" class="field-input" min="0" max="100000" value="0">
+
                     <label for="totalPrice" class="field-label">إجمالي السعر</label>
-                    <input type="number" id="totalPrice" class="field-input" min="0" max="1000000">
-
-                    <label for="maleQty" class="field-label">كمية ذكور</label>
-                    <input type="number" id="maleQty" class="field-input" min="0" max="1000">
-
-                    <label for="femaleQty" class="field-label">كمية إناث</label>
-                    <input type="number" id="femaleQty" class="field-input" min="0" max="1000">
-
-                    <!-- الصف 3 -->
-                    <label for="unitPrice" class="field-label">السعر الفردي</label>
-                    <input type="number" id="unitPrice" class="field-input" min="0" max="100000">
+                    <input type="number" id="totalPrice" class="field-input" min="0" max="1000000" value="0">
 
                     <label for="totalCost" class="field-label">الإجمالي</label>
                     <input type="number" id="totalCost" class="field-input" min="0" max="1000000" readonly>
@@ -90,18 +93,18 @@
                     <thead>
                         <tr>
                             <th>رقم الحظيرة</th>
-                            <th>الحظيرة المستخدمة أخيراً</th>
                             <th>اسم الحظيرة</th>
-                            <th>تاريخ الشراء</th>
-                            <th>الاستيعاب</th>
+                            <th>تاريخ الشراء (ميلادي)</th>
+                            <th>تاريخ الشراء (هجري)</th>
                             <th>الصنف</th>
-                            <th>اليوم/الشهر</th>
                             <th>النوع</th>
-                            <th>الموقع</th>
-                            <th>إجمالي السعر</th>
                             <th>كمية ذكور</th>
                             <th>كمية إناث</th>
+                            <th>المجموع</th>
+                            <th>اليوم/الشهر</th>
+                            <th>الموقع</th>
                             <th>السعر الفردي</th>
+                            <th>إجمالي السعر</th>
                             <th>الإجمالي</th>
                         </tr>
                     </thead>
