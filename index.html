@@ -495,6 +495,8 @@
                 <button class="btn btn-save"><i class="fas fa-save"></i> حفظ</button>
                 <button class="btn btn-view"><i class="fas fa-chart-bar"></i> عرض البيانات</button>
                 <button class="btn btn-delete"><i class="fas fa-trash"></i> حذف</button>
+                <button class="btn btn-export"><i class="fas fa-download"></i> تصدير</button>
+                <button class="btn btn-import"><i class="fas fa-upload"></i> استيراد</button>
             </div>
 
             <div class="table-container">
@@ -526,41 +528,9 @@
     </div>
 
     <script>
-        // البيانات الوهمية
-        const sampleData = [
-            {
-                id: 1,
-                barnNumber: "1",
-                barnName: "الحظيرة الأولى",
-                purchaseDate: "2023-10-15",
-                capacity: 500,
-                animalType: "أغنام",
-                dayMonth: "15/10",
-                gender: "حري",
-                location: "شمال المزرعة",
-                maleQty: 120,
-                femaleQty: 180,
-                totalQty: 300,
-                unitPrice: 350.00,
-                totalPrice: 105000.00
-            },
-            {
-                id: 2,
-                barnNumber: "2",
-                barnName: "الحظيرة الثانية",
-                purchaseDate: "2023-10-10",
-                capacity: 400,
-                animalType: "أبقار",
-                dayMonth: "10/10",
-                gender: "هولشتاين",
-                location: "جنوب المزرعة",
-                maleQty: 20,
-                femaleQty: 80,
-                totalQty: 100,
-                unitPrice: 2000.00,
-                totalPrice: 200000.00
-            }
-        ];
+        // البيانات المحفوظة محلياً
+        let barnsData = [];
+        let currentEditId = null;
 
         // أنواع الحيوانات لكل صنف
         const animalTypesMapping = {
@@ -597,6 +567,24 @@
                 6: "السبت"
             };
             return days[date.getDay()];
+        }
+
+        // توليد معرف فريد لكل حظيرة
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // حفظ البيانات في localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('barnsData', JSON.stringify(barnsData));
+        }
+
+        // تحميل البيانات من localStorage
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('barnsData');
+            if (savedData) {
+                barnsData = JSON.parse(savedData);
+            }
         }
 
         // تحديث أنواع الحيوانات بناءً على الصنف المختار
@@ -679,8 +667,8 @@
 
         // تحديث الإحصائيات
         function updateStatistics() {
-            const totalBarns = sampleData.length;
-            const totalAnimals = sampleData.reduce((sum, barn) => sum + barn.totalQty, 0);
+            const totalBarns = barnsData.length;
+            const totalAnimals = barnsData.reduce((sum, barn) => sum + barn.totalQty, 0);
             
             document.getElementById('total-barns').textContent = `عدد الحظائر: ${totalBarns}`;
             document.getElementById('total-animals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
@@ -700,6 +688,7 @@
             document.getElementById('unit-price').value = 0;
             document.getElementById('total-price').value = 0;
             document.getElementById('alert-label').style.display = 'none';
+            document.getElementById('supervisor').selectedIndex = 0;
             
             // تحديث أنواع الحيوانات
             updateAnimalTypes();
@@ -711,40 +700,141 @@
             
             // تحديث بيانات الحظيرة
             updateBarnData();
+            
+            // إعادة تعيين معرف التعديل
+            currentEditId = null;
+        }
+
+        // جمع البيانات من النموذج
+        function collectFormData() {
+            return {
+                id: currentEditId || generateId(),
+                barnNumber: document.getElementById('barn-number').value,
+                barnName: document.getElementById('barn-name').value,
+                purchaseDate: document.getElementById('gregorian-date').value,
+                capacity: parseInt(document.getElementById('capacity').value) || 0,
+                animalType: document.getElementById('animal-type').value,
+                dayMonth: document.getElementById('hijri-date').value,
+                gender: document.getElementById('gender').value,
+                location: document.getElementById('location').value,
+                maleQty: parseInt(document.getElementById('male-qty').value) || 0,
+                femaleQty: parseInt(document.getElementById('female-qty').value) || 0,
+                totalQty: parseInt(document.getElementById('total-quantity').value) || 0,
+                unitPrice: parseFloat(document.getElementById('unit-price').value) || 0,
+                totalPrice: parseFloat(document.getElementById('total-price').value) || 0,
+                supervisor: document.getElementById('supervisor').value
+            };
         }
 
         // حفظ البيانات
         function saveBarn() {
-            const barnName = document.getElementById('barn-name').value.trim();
-            const totalQty = parseInt(document.getElementById('total-quantity').value) || 0;
+            const barnData = collectFormData();
+            const barnName = barnData.barnName.trim();
             
             if (!barnName) {
                 alert('يرجى إدخال اسم الحظيرة.');
                 return;
             }
             
-            if (totalQty === 0) {
+            if (barnData.totalQty === 0) {
                 alert('يرجى إدخال كمية الحيوانات.');
                 return;
             }
             
-            // في التطبيق الحقيقي، سيتم إرسال البيانات إلى الخادم
-            alert('تم حفظ البيانات بنجاح!');
+            // التحقق من وجود حظيرة بنفس الرقم
+            const existingBarnIndex = barnsData.findIndex(barn => 
+                barn.id === currentEditId || barn.barnNumber === barnData.barnNumber
+            );
+            
+            if (existingBarnIndex >= 0 && barnsData[existingBarnIndex].id !== currentEditId) {
+                alert('يوجد حظيرة أخرى بنفس الرقم. يرجى اختيار رقم مختلف.');
+                return;
+            }
+            
+            if (currentEditId) {
+                // تعديل حظيرة موجودة
+                const index = barnsData.findIndex(barn => barn.id === currentEditId);
+                if (index >= 0) {
+                    barnsData[index] = barnData;
+                }
+            } else {
+                // إضافة حظيرة جديدة
+                barnsData.push(barnData);
+            }
+            
+            // حفظ البيانات في localStorage
+            saveToLocalStorage();
             
             // إعادة تحميل البيانات
             loadData();
+            clearFields();
+            
+            alert('تم حفظ البيانات بنجاح!');
         }
 
         // حذف الحظيرة
         function deleteBarn() {
+            if (!currentEditId) {
+                alert('يرجى اختيار حظيرة للحذف.');
+                return;
+            }
+            
             if (confirm('هل تريد حذف الحظيرة المحددة؟')) {
-                // في التطبيق الحقيقي، سيتم إرسال طلب الحذف إلى الخادم
-                alert('تم حذف الحظيرة بنجاح!');
+                barnsData = barnsData.filter(barn => barn.id !== currentEditId);
+                
+                // حفظ البيانات في localStorage
+                saveToLocalStorage();
                 
                 // إعادة تحميل البيانات
                 loadData();
                 clearFields();
+                
+                alert('تم حذف الحظيرة بنجاح!');
             }
+        }
+
+        // تصدير البيانات
+        function exportData() {
+            const dataStr = JSON.stringify(barnsData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = 'barns_data.json';
+            link.click();
+        }
+
+        // استيراد البيانات
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    try {
+                        const importedData = JSON.parse(event.target.result);
+                        
+                        if (Array.isArray(importedData)) {
+                            barnsData = importedData;
+                            saveToLocalStorage();
+                            loadData();
+                            alert('تم استيراد البيانات بنجاح!');
+                        } else {
+                            alert('ملف غير صالح. يرجى اختيار ملف JSON صحيح.');
+                        }
+                    } catch (error) {
+                        alert('خطأ في قراءة الملف. يرجى التأكد من صحة الملف.');
+                    }
+                };
+                
+                reader.readAsText(file);
+            };
+            
+            input.click();
         }
 
         // تحميل البيانات في الجدول
@@ -752,7 +842,7 @@
             const tableBody = document.getElementById('table-body');
             tableBody.innerHTML = '';
             
-            sampleData.forEach(barn => {
+            barnsData.forEach(barn => {
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
@@ -806,9 +896,16 @@
             document.getElementById('unit-price').value = barn.unitPrice;
             document.getElementById('total-price').value = barn.totalPrice;
             document.getElementById('gregorian-date').value = barn.purchaseDate;
+            document.getElementById('supervisor').value = barn.supervisor || 'عيسى شايع';
             
             // تحديث التاريخ الهجري واسم اليوم
             updateDateInfo();
+            
+            // تحديث أنواع الحيوانات بناءً على الصنف المختار
+            updateAnimalTypes();
+            
+            // تعيين معرف التعديل
+            currentEditId = barn.id;
             
             // التحقق من السعة
             checkCapacity();
@@ -816,6 +913,9 @@
 
         // تهيئة التطبيق
         function initApp() {
+            // تحميل البيانات من localStorage
+            loadFromLocalStorage();
+            
             // تعيين التاريخ الحالي
             const today = new Date();
             document.getElementById('gregorian-date').valueAsDate = today;
@@ -843,6 +943,8 @@
             document.querySelector('.btn-save').addEventListener('click', saveBarn);
             document.querySelector('.btn-view').addEventListener('click', loadData);
             document.querySelector('.btn-delete').addEventListener('click', deleteBarn);
+            document.querySelector('.btn-export').addEventListener('click', exportData);
+            document.querySelector('.btn-import').addEventListener('click', importData);
             document.querySelector('.back-btn').addEventListener('click', () => {
                 alert('الرجوع للقائمة الرئيسية');
             });
