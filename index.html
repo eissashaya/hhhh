@@ -4,7 +4,521 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏠 نظام إدارة الحظائر</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* التنسيقات العامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            color: #2c3e50;
+            direction: rtl;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* رأس الصفحة */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid #e74c3c;
+            min-width: 120px;
+            height: 45px;
+            font-size: 14pt !important;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #a93226);
+            border: 2px solid #c0392b;
+        }
+
+        .title {
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            flex: 1;
+            border: 2px solid #2980b9;
+            margin: 5px;
+            font-size: 20pt !important;
+        }
+
+        /* الإحصائيات */
+        .stats-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            flex: 1;
+            text-align: center;
+            border: 2px solid #27ae60;
+            font-weight: bold;
+            font-size: 16pt !important;
+        }
+
+        /* نموذج الإدخال */
+        .form-container {
+            background: white;
+            border: 2px solid #bdc3c7;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+        }
+
+        .form-columns {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+
+        .column {
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .column:nth-child(1) {
+            border: 2px solid #3498db;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        }
+
+        .column:nth-child(2) {
+            border: 2px solid #e67e22;
+            background: linear-gradient(to bottom, #fef9e7, #fcf3cf);
+        }
+
+        .column:nth-child(3) {
+            border: 3px solid #8e44ad;
+            background: linear-gradient(to bottom, #f4ecf7, #e8daef);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .column:nth-child(4) {
+            border: 2px solid #1abc9c;
+            background: linear-gradient(to bottom, #e8f6f3, #d1f2eb);
+        }
+
+        .column:nth-child(5) {
+            border: 3px solid #f39c12;
+            background: linear-gradient(to bottom, #fef5e7, #fdebd0);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .column h3 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 5px;
+            font-size: 16pt !important;
+        }
+
+        .column:nth-child(3) h3 {
+            color: #8e44ad;
+            border-bottom: 3px solid #8e44ad;
+            font-size: 16pt !important;
+            padding-bottom: 8px;
+        }
+
+        .column:nth-child(5) h3 {
+            color: #f39c12;
+            border-bottom: 3px solid #f39c12;
+            font-size: 16pt !important;
+            padding-bottom: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+            background: linear-gradient(to bottom, #34495e, #2c3e50);
+            padding: 12px 15px;
+            border-radius: 6px;
+            border: 1px solid #2c3e50;
+            color: white;
+            font-size: 14pt !important;
+        }
+
+        .form-group label[for="maleQty"],
+        .form-group label[for="femaleQty"] {
+            background: linear-gradient(to bottom, #8e44ad, #9b59b6) !important;
+            border: 2px solid #8e44ad !important;
+            color: white;
+            font-weight: bold;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 14pt !important;
+        }
+
+        .form-group label[for="unitPrice"] {
+            background: linear-gradient(to bottom, #f39c12, #e67e22) !important;
+            border: 2px solid #f39c12 !important;
+            color: white;
+            font-weight: bold;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 14pt !important;
+        }
+
+        /* تكبير جميع حقول الإدخال لتصبح بنفس حجم حقل الاستيعاب */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dcdde1;
+            border-radius: 8px;
+            font-size: 16pt !important;
+            background-color: white;
+            color: #2c3e50;
+            height: 55px;
+            font-weight: bold;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            background-color: #ecf0f1;
+            outline: none;
+        }
+
+        /* تكبير خط حقل الاستيعاب */
+        #capacity {
+            font-size: 16pt !important;
+            font-weight: bold !important;
+            color: #16a085 !important;
+            background: linear-gradient(to bottom, #e8f6f3, #d1f2eb) !important;
+            border: 3px solid #1abc9c !important;
+            text-align: center;
+            padding: 12px !important;
+            height: 55px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        #totalQuantity {
+            background-color: #e8f6f3;
+            border: 2px solid #1abc9c;
+            color: #16a085;
+            font-weight: bold;
+            font-size: 16pt !important;
+        }
+
+        /* تحسين حقول الأعداد */
+        #maleQty, #femaleQty {
+            border: 2px solid #9b59b6 !important;
+            background: linear-gradient(to bottom, #f4ecf7, #e8daef) !important;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            font-size: 16pt !important;
+            color: #8e44ad;
+            height: 55px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #maleQty:focus, #femaleQty:focus {
+            border-color: #8e44ad !important;
+            background: linear-gradient(to bottom, #e8daef, #d2b4de) !important;
+            outline: none;
+        }
+
+        /* تحسين مظهر حقل السعر الفردي الجديد */
+        #unitPrice {
+            border: 2px solid #f39c12 !important;
+            background: linear-gradient(to bottom, #fef5e7, #fdebd0) !important;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            font-size: 16pt !important;
+            color: #e67e22;
+            height: 55px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #unitPrice:focus {
+            border-color: #e67e22 !important;
+            background: linear-gradient(to bottom, #fdebd0, #fad7a0) !important;
+            outline: none;
+        }
+
+        /* تحسين مظهر أزرار الزيادة والنقصان في العداد */
+        #unitPrice::-webkit-inner-spin-button,
+        #unitPrice::-webkit-outer-spin-button {
+            height: 35px;
+            opacity: 1;
+            margin: 0 5px;
+        }
+
+        #totalPrice {
+            background: linear-gradient(to bottom, #e8f4ff, #d6eaf8) !important;
+            border: 2px solid #3498db !important;
+            color: #2980b9;
+            font-weight: bold;
+            text-align: center;
+            padding: 12px;
+            font-size: 16pt !important;
+            height: 55px;
+            border-radius: 8px;
+        }
+
+        #dayName {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            border: 2px solid #27ae60;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 16pt !important;
+        }
+
+        .alert-label {
+            background: linear-gradient(to bottom, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 12px;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            margin-top: 5px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14pt !important;
+        }
+
+        /* أزرار العمليات */
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14pt !important;
+            min-height: 55px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-new {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: 2px solid #3498db;
+        }
+
+        .btn-new:hover {
+            background: linear-gradient(to bottom, #2980b9, #3498db);
+        }
+
+        .btn-save {
+            background: linear-gradient(to bottom, #27ae60, #219a52);
+            color: white;
+            border: 2px solid #27ae60;
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(to bottom, #219a52, #27ae60);
+        }
+
+        /* جدول البيانات */
+        .table-container {
+            background: white;
+            border: 2px solid #34495e;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .table-container h2 {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 2px solid #2c3e50;
+            font-size: 18pt !important;
+        }
+
+        .barns-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            font-size: 12pt !important;
+        }
+
+        .barns-table th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border: none;
+            font-size: 12pt !important;
+        }
+
+        .barns-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 11pt !important;
+        }
+
+        .barns-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .barns-table tr:hover {
+            background-color: #ecf0f1;
+        }
+
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 1200px) {
+            .form-columns {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .form-control,
+            #capacity,
+            #maleQty,
+            #femaleQty,
+            #unitPrice,
+            #totalPrice,
+            #dayName {
+                font-size: 14pt !important;
+                height: 50px;
+                padding: 10px;
+            }
+            
+            .btn {
+                font-size: 12pt !important;
+                min-height: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-columns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+            }
+            
+            .form-control,
+            #capacity,
+            #maleQty,
+            #femaleQty,
+            #unitPrice,
+            #totalPrice,
+            #dayName {
+                font-size: 12pt !important;
+                height: 45px;
+                padding: 8px;
+            }
+            
+            .btn {
+                font-size: 11pt !important;
+                min-height: 45px;
+            }
+            
+            .column h3,
+            .column:nth-child(3) h3,
+            .column:nth-child(5) h3 {
+                font-size: 14pt !important;
+            }
+            
+            .form-group label,
+            .form-group label[for="maleQty"],
+            .form-group label[for="femaleQty"],
+            .form-group label[for="unitPrice"] {
+                font-size: 12pt !important;
+                padding: 10px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-columns {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+            }
+            
+            .stats-container {
+                flex-direction: column;
+            }
+            
+            .form-control,
+            #capacity,
+            #maleQty,
+            #femaleQty,
+            #unitPrice,
+            #totalPrice,
+            #dayName {
+                font-size: 11pt !important;
+                height: 40px;
+                padding: 6px;
+            }
+            
+            .btn {
+                font-size: 10pt !important;
+                min-height: 40px;
+            }
+            
+            .column h3,
+            .column:nth-child(3) h3,
+            .column:nth-child(5) h3 {
+                font-size: 12pt !important;
+            }
+            
+            .form-group label,
+            .form-group label[for="maleQty"],
+            .form-group label[for="femaleQty"],
+            .form-group label[for="unitPrice"] {
+                font-size: 11pt !important;
+                padding: 8px 10px;
+            }
+            
+            .table-container h2 {
+                font-size: 14pt !important;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -139,17 +653,11 @@
         <div class="buttons-container">
             <button id="btnNew" class="btn btn-new">🆕 جديد</button>
             <button id="btnSave" class="btn btn-save">💾 حفظ</button>
-            <button id="btnView" class="btn btn-view">📊 عرض البيانات</button>
-            <button id="btnDelete" class="btn btn-delete">🗑️ حذف</button>
         </div>
 
         <!-- جدول البيانات -->
         <div class="table-container">
             <h2>📊 بيانات الحظائر</h2>
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="بحث في الحظائر..." class="search-input">
-                <button id="searchBtn" class="btn btn-search">🔍 بحث</button>
-            </div>
             <table id="barnsTable" class="barns-table">
                 <thead>
                     <tr>
@@ -166,7 +674,6 @@
                         <th>الإجمالي</th>
                         <th>السعر الفردي</th>
                         <th>إجمالي السعر</th>
-                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="barnsTableBody">
@@ -176,6 +683,404 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // بيانات التطبيق
+        class BarnApp {
+            constructor() {
+                this.selectedId = null;
+                this.barns = JSON.parse(localStorage.getItem('barns')) || [];
+                
+                // أنواع الحيوانات لكل صنف
+                this.animalTypesMapping = {
+                    "أغنام": ["حري", "نعيمي", "نجدي", "شامي"],
+                    "أبقار": ["بلدي", "هولشتاين", "ساحلي"], 
+                    "ماعز": ["شامي", "سعادي", "حيسي"],
+                    "جمال": ["مجاهيم", "شعل", "وضح"]
+                };
+                
+                // بيانات الحظائر
+                this.barnData = {
+                    "1": {"name": "الحظيرة الأولى", "location": "شمال المزرعة", "capacity": 200},
+                    "2": {"name": "الحظيرة الثانية", "location": "جنوب المزرعة", "capacity": 300},
+                    "3": {"name": "الحظيرة الثالثة", "location": "شرق المزرعة", "capacity": 200},
+                    "4": {"name": "الحظيرة الرابعة", "location": "غرب المزرعة", "capacity": 300},
+                    "5": {"name": "الحظيرة الخامسة", "location": "وسط المزرعة", "capacity": 200},
+                    "6": {"name": "الحظيرة السادسة", "location": "شمال المزرعة", "capacity": 300},
+                    "7": {"name": "الحظيرة السابعة", "location": "جنوب المزرعة", "capacity": 200},
+                    "8": {"name": "الحظيرة الثامنة", "location": "شرق المزرعة", "capacity": 300},
+                    "9": {"name": "الحظيرة التاسعة", "location": "غرب المزرعة", "capacity": 200},
+                    "10": {"name": "الحظيرة العاشرة", "location": "وسط المزرعة", "capacity": 300},
+                    "11": {"name": "الحظيرة الحادية عشر", "location": "شمال المزرعة", "capacity": 200},
+                    "12": {"name": "الحظيرة الثانية عشر", "location": "جنوب المزرعة", "capacity": 300},
+                    "13": {"name": "الحظيرة الثالثة عشر", "location": "شرق المزرعة", "capacity": 200},
+                    "14": {"name": "الحظيرة الرابعة عشر", "location": "غرب المزرعة", "capacity": 300},
+                    "15": {"name": "الحظيرة الخامسة عشر", "location": "وسط المزرعة", "capacity": 200},
+                    "16": {"name": "الحظيرة السادسة عشر", "location": "شمال المزرعة", "capacity": 300},
+                    "17": {"name": "الحظيرة السابعة عشر", "location": "جنوب المزرعة", "capacity": 200},
+                    "18": {"name": "الحظيرة الثامنة عشر", "location": "شرق المزرعة", "capacity": 300},
+                    "19": {"name": "الحظيرة التاسعة عشر", "location": "غرب المزرعة", "capacity": 200},
+                    "20": {"name": "الحظيرة العشرون", "location": "وسط المزرعة", "capacity": 300}
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.populateBarnNumbers();
+                this.updateAnimalTypes();
+                this.setAutoBarnNumber();
+                this.updateHijriDate();
+                this.updateDayName();
+                this.updateStatistics();
+                this.loadData();
+            }
+            
+            setupEventListeners() {
+                // أزرار العمليات
+                document.getElementById('btnNew').addEventListener('click', () => this.clearFields());
+                document.getElementById('btnSave').addEventListener('click', () => this.saveBarn());
+                
+                // التحديثات التلقائية
+                document.getElementById('animalType').addEventListener('change', () => this.updateAnimalTypes());
+                document.getElementById('maleQty').addEventListener('input', () => this.updateTotals());
+                document.getElementById('femaleQty').addEventListener('input', () => this.updateTotals());
+                document.getElementById('unitPrice').addEventListener('input', () => this.updateTotals());
+                document.getElementById('gregorianDate').addEventListener('change', () => {
+                    this.updateHijriDate();
+                    this.updateDayName();
+                });
+                document.getElementById('maleQty').addEventListener('input', () => this.checkCapacity());
+                document.getElementById('femaleQty').addEventListener('input', () => this.checkCapacity());
+                document.getElementById('capacity').addEventListener('input', () => this.checkCapacity());
+                document.getElementById('barnNumber').addEventListener('change', () => this.updateBarnData());
+                
+                // زر الرجوع
+                document.getElementById('backBtn').addEventListener('click', () => {
+                    if (confirm('هل تريد الرجوع إلى القائمة الرئيسية؟')) {
+                        window.close();
+                    }
+                });
+            }
+            
+            populateBarnNumbers() {
+                const barnNumberSelect = document.getElementById('barnNumber');
+                barnNumberSelect.innerHTML = '';
+                
+                for (let i = 1; i <= 20; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = i;
+                    barnNumberSelect.appendChild(option);
+                }
+            }
+            
+            updateAnimalTypes() {
+                const selectedAnimal = document.getElementById('animalType').value;
+                const genderSelect = document.getElementById('gender');
+                
+                genderSelect.innerHTML = '';
+                
+                if (this.animalTypesMapping[selectedAnimal]) {
+                    this.animalTypesMapping[selectedAnimal].forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type;
+                        option.textContent = type;
+                        genderSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            updateBarnData() {
+                const selectedNumber = document.getElementById('barnNumber').value;
+                
+                if (this.barnData[selectedNumber]) {
+                    document.getElementById('barnName').value = this.barnData[selectedNumber].name;
+                    document.getElementById('capacity').value = this.barnData[selectedNumber].capacity;
+                    
+                    const locationSelect = document.getElementById('location');
+                    for (let i = 0; i < locationSelect.options.length; i++) {
+                        if (locationSelect.options[i].value === this.barnData[selectedNumber].location) {
+                            locationSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                } else {
+                    try {
+                        const barnNum = parseInt(selectedNumber);
+                        const capacityValue = barnNum % 2 === 1 ? 200 : 300;
+                        document.getElementById('capacity').value = capacityValue;
+                        document.getElementById('barnName').value = `الحظيرة ${selectedNumber}`;
+                        
+                        const locationSelect = document.getElementById('location');
+                        locationSelect.selectedIndex = barnNum % 5;
+                    } catch (error) {
+                        document.getElementById('capacity').value = 200;
+                    }
+                }
+            }
+            
+            updateTotals() {
+                const maleQty = parseInt(document.getElementById('maleQty').value) || 0;
+                const femaleQty = parseInt(document.getElementById('femaleQty').value) || 0;
+                const totalQty = maleQty + femaleQty;
+                
+                document.getElementById('totalQuantity').value = totalQty;
+                
+                // الحصول على قيمة السعر الفردي كرقم مباشرة
+                const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+                const totalPrice = unitPrice * totalQty;
+                
+                document.getElementById('totalPrice').value = totalPrice.toLocaleString('ar-EG') + ' ريال';
+            }
+            
+            updateHijriDate() {
+                const gregorianDate = new Date(document.getElementById('gregorianDate').value);
+                if (!isNaN(gregorianDate.getTime())) {
+                    const hijriDate = this.convertToHijri(gregorianDate);
+                    document.getElementById('hijriDate').value = hijriDate;
+                }
+            }
+            
+            convertToHijri(gregorianDate) {
+                // تحويل مبسط للتاريخ الهجري (للاستخدام الفعلي، يفضل استخدام مكتبة متخصصة)
+                const year = gregorianDate.getFullYear();
+                const month = gregorianDate.getMonth() + 1;
+                const day = gregorianDate.getDate();
+                
+                // تحويل تقريبي (هذه مجرد مثال، التحويل الدقيق يتطلب خوارزمية معقدة)
+                const hijriYear = Math.round((year - 622) * (33/32));
+                const hijriMonth = month;
+                const hijriDay = day;
+                
+                return `${hijriYear}/${hijriMonth.toString().padStart(2, '0')}/${hijriDay.toString().padStart(2, '0')}`;
+            }
+            
+            updateDayName() {
+                const gregorianDate = new Date(document.getElementById('gregorianDate').value);
+                if (!isNaN(gregorianDate.getTime())) {
+                    const dayName = this.getDayNameArabic(gregorianDate);
+                    document.getElementById('dayName').value = dayName;
+                }
+            }
+            
+            getDayNameArabic(date) {
+                const days = {
+                    0: "الأحد",
+                    1: "الاثنين",
+                    2: "الثلاثاء", 
+                    3: "الأربعاء",
+                    4: "الخميس",
+                    5: "الجمعة",
+                    6: "السبت"
+                };
+                return days[date.getDay()];
+            }
+            
+            checkCapacity() {
+                const totalAnimals = parseInt(document.getElementById('maleQty').value || 0) + 
+                                    parseInt(document.getElementById('femaleQty').value || 0);
+                const capacity = parseInt(document.getElementById('capacity').value || 0);
+                
+                const alertLabel = document.getElementById('alertLabel');
+                
+                if (capacity > 0 && totalAnimals > capacity) {
+                    alertLabel.textContent = `⚠️ تنبيه: العدد ${totalAnimals} يتجاوز السعة ${capacity}`;
+                    alertLabel.style.display = 'block';
+                } else {
+                    alertLabel.style.display = 'none';
+                }
+            }
+            
+            setAutoBarnNumber() {
+                const nextNumber = this.getNextBarnNumber();
+                const barnNumberSelect = document.getElementById('barnNumber');
+                
+                for (let i = 0; i < barnNumberSelect.options.length; i++) {
+                    if (barnNumberSelect.options[i].value === nextNumber) {
+                        barnNumberSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+                
+                this.updateBarnData();
+            }
+            
+            getNextBarnNumber() {
+                if (this.barns.length === 0) return "1";
+                
+                const lastBarn = this.barns.reduce((prev, current) => 
+                    (parseInt(prev.رقم_الحظيرة) > parseInt(current.رقم_الحظيرة)) ? prev : current
+                );
+                
+                return (parseInt(lastBarn.رقم_الحظيرة) + 1).toString();
+            }
+            
+            clearFields() {
+                this.selectedId = null;
+                this.setAutoBarnNumber();
+                document.getElementById('barnName').value = '';
+                document.getElementById('animalType').selectedIndex = 0;
+                this.updateAnimalTypes();
+                document.getElementById('location').selectedIndex = 0;
+                document.getElementById('maleQty').value = '0';
+                document.getElementById('femaleQty').value = '0';
+                document.getElementById('totalQuantity').value = '0';
+                document.getElementById('gregorianDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('supervisor').selectedIndex = 0;
+                document.getElementById('unitPrice').value = '1'; // تعيين القيمة الافتراضية إلى 1
+                document.getElementById('totalPrice').value = '';
+                document.getElementById('alertLabel').style.display = 'none';
+                
+                this.updateHijriDate();
+                this.updateDayName();
+            }
+            
+            saveBarn() {
+                // التحقق من البيانات
+                if (!document.getElementById('barnName').value.trim()) {
+                    alert('يرجى إدخال اسم الحظيرة.');
+                    return;
+                }
+                
+                if (parseInt(document.getElementById('totalQuantity').value) === 0) {
+                    alert('يرجى إدخال كمية الحيوانات.');
+                    return;
+                }
+                
+                // التحقق من صحة السعر الفردي (الآن هو رقم مباشرة)
+                const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+                if (unitPrice < 1) {
+                    alert('السعر الفردي يجب أن يكون 1 أو أكثر.');
+                    document.getElementById('unitPrice').focus();
+                    return;
+                }
+                
+                // حساب البيانات
+                const totalAnimals = parseInt(document.getElementById('totalQuantity').value);
+                const capacity = parseInt(document.getElementById('capacity').value);
+                const alertFlag = totalAnimals > capacity && capacity > 0;
+                const totalPrice = unitPrice * totalAnimals;
+                
+                const barnData = {
+                    رقم_الحظيرة: document.getElementById('barnNumber').value,
+                    اسم_الحظيرة: document.getElementById('barnName').value,
+                    الاستيعاب: capacity,
+                    الصنف: document.getElementById('animalType').value,
+                    النوع: document.getElementById('gender').value,
+                    الموقع: document.getElementById('location').value,
+                    عدد_ذكور: parseInt(document.getElementById('maleQty').value),
+                    عدد_إناث: parseInt(document.getElementById('femaleQty').value),
+                    الإجمالي: totalAnimals,
+                    تاريخ_الهجري: document.getElementById('hijriDate').value,
+                    تاريخ_الميلادي: document.getElementById('gregorianDate').value,
+                    المشرف: document.getElementById('supervisor').value,
+                    السعر_الفردي: unitPrice, // الآن هو رقم مباشرة
+                    إجمالي_السعر: totalPrice,
+                    التنبيه: alertFlag,
+                    تاريخ_الإضافة: new Date().toISOString()
+                };
+                
+                try {
+                    // إضافة حظيرة جديدة فقط (لا يوجد تعديل)
+                    barnData.id = Date.now().toString();
+                    this.barns.push(barnData);
+                    
+                    // حفظ في localStorage
+                    localStorage.setItem('barns', JSON.stringify(this.barns));
+                    
+                    alert('تم إضافة الحظيرة بنجاح!');
+                    this.clearFields();
+                    this.loadData();
+                    
+                } catch (error) {
+                    alert('حدث خطأ أثناء الحفظ: ' + error.message);
+                }
+            }
+            
+            loadData() {
+                const tableBody = document.getElementById('barnsTableBody');
+                tableBody.innerHTML = '';
+                
+                this.barns.forEach(barn => {
+                    const row = document.createElement('tr');
+                    
+                    // إضافة بيانات الصف
+                    const columns = [
+                        barn.رقم_الحظيرة,
+                        barn.اسم_الحظيرة,
+                        barn.تاريخ_الميلادي,
+                        barn.الاستيعاب,
+                        barn.الصنف,
+                        this.getDayMonth(barn.تاريخ_الميلادي),
+                        barn.النوع,
+                        barn.الموقع,
+                        barn.عدد_ذكور,
+                        barn.عدد_إناث,
+                        barn.الإجمالي,
+                        this.formatPrice(barn.السعر_الفردي),
+                        this.formatPrice(barn.إجمالي_السعر)
+                    ];
+                    
+                    columns.forEach((value, index) => {
+                        const cell = document.createElement('td');
+                        cell.textContent = value;
+                        
+                        // تلوين الأعمدة العددية
+                        if ([3, 8, 9, 10].includes(index)) {
+                            cell.style.backgroundColor = '#f8f9fa';
+                            cell.style.textAlign = 'center';
+                            cell.style.fontWeight = 'bold';
+                            
+                            // تكبير خط الاستيعاب في الجدول أيضاً
+                            if (index === 3) {
+                                cell.style.fontSize = '14pt';
+                                cell.style.color = '#16a085';
+                                cell.style.background = 'linear-gradient(to bottom, #e8f6f3, #d1f2eb)';
+                            }
+                        }
+                        
+                        row.appendChild(cell);
+                    });
+                    
+                    tableBody.appendChild(row);
+                });
+                
+                this.updateStatistics();
+            }
+            
+            updateStatistics() {
+                const totalBarns = this.barns.length;
+                const totalAnimals = this.barns.reduce((sum, barn) => sum + (barn.الإجمالي || 0), 0);
+                
+                document.getElementById('totalBarns').textContent = `عدد الحظائر: ${totalBarns}`;
+                document.getElementById('totalAnimals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
+            }
+            
+            getDayMonth(dateValue) {
+                if (!dateValue) return "";
+                try {
+                    const date = new Date(dateValue);
+                    return `${date.getDate()}/${date.getMonth() + 1}`;
+                } catch (error) {
+                    return "";
+                }
+            }
+            
+            formatPrice(priceValue) {
+                if (!priceValue) return "0.00 ريال";
+                try {
+                    return `${parseFloat(priceValue).toFixed(2)} ريال`;
+                } catch (error) {
+                    return "0.00 ريال";
+                }
+            }
+        }
+
+        // تهيئة التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', () => {
+            new BarnApp();
+        });
+    </script>
 </body>
 </html>
