@@ -23,7 +23,17 @@ class BarnApp {
             "7": {"name": "الحظيرة السابعة", "location": "جنوب المزرعة", "capacity": 200},
             "8": {"name": "الحظيرة الثامنة", "location": "شرق المزرعة", "capacity": 300},
             "9": {"name": "الحظيرة التاسعة", "location": "غرب المزرعة", "capacity": 200},
-            "10": {"name": "الحظيرة العاشرة", "location": "وسط المزرعة", "capacity": 300}
+            "10": {"name": "الحظيرة العاشرة", "location": "وسط المزرعة", "capacity": 300},
+            "11": {"name": "الحظيرة الحادية عشر", "location": "شمال المزرعة", "capacity": 200},
+            "12": {"name": "الحظيرة الثانية عشر", "location": "جنوب المزرعة", "capacity": 300},
+            "13": {"name": "الحظيرة الثالثة عشر", "location": "شرق المزرعة", "capacity": 200},
+            "14": {"name": "الحظيرة الرابعة عشر", "location": "غرب المزرعة", "capacity": 300},
+            "15": {"name": "الحظيرة الخامسة عشر", "location": "وسط المزرعة", "capacity": 200},
+            "16": {"name": "الحظيرة السادسة عشر", "location": "شمال المزرعة", "capacity": 300},
+            "17": {"name": "الحظيرة السابعة عشر", "location": "جنوب المزرعة", "capacity": 200},
+            "18": {"name": "الحظيرة الثامنة عشر", "location": "شرق المزرعة", "capacity": 300},
+            "19": {"name": "الحظيرة التاسعة عشر", "location": "غرب المزرعة", "capacity": 200},
+            "20": {"name": "الحظيرة العشرون", "location": "وسط المزرعة", "capacity": 300}
         };
         
         this.init();
@@ -66,6 +76,13 @@ class BarnApp {
         document.getElementById('backBtn').addEventListener('click', () => {
             if (confirm('هل تريد الرجوع إلى القائمة الرئيسية؟')) {
                 window.close();
+            }
+        });
+        
+        // البحث عند الضغط على Enter
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchBarns();
             }
         });
     }
@@ -134,18 +151,11 @@ class BarnApp {
         
         document.getElementById('totalQuantity').value = totalQty;
         
-        const unitPriceText = document.getElementById('unitPrice').value.trim();
-        if (unitPriceText) {
-            try {
-                const unitPrice = parseFloat(unitPriceText);
-                const totalPrice = unitPrice * totalQty;
-                document.getElementById('totalPrice').value = totalPrice.toFixed(2);
-            } catch (error) {
-                document.getElementById('totalPrice').value = '0.00';
-            }
-        } else {
-            document.getElementById('totalPrice').value = '0.00';
-        }
+        // الحصول على قيمة السعر الفردي كرقم مباشرة
+        const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+        const totalPrice = unitPrice * totalQty;
+        
+        document.getElementById('totalPrice').value = totalPrice.toLocaleString('ar-EG') + ' ريال';
     }
     
     updateHijriDate() {
@@ -234,16 +244,15 @@ class BarnApp {
         this.selectedId = null;
         this.setAutoBarnNumber();
         document.getElementById('barnName').value = '';
-        document.getElementById('capacity').value = '';
         document.getElementById('animalType').selectedIndex = 0;
-        document.getElementById('gender').selectedIndex = 0;
+        this.updateAnimalTypes();
         document.getElementById('location').selectedIndex = 0;
         document.getElementById('maleQty').value = '0';
         document.getElementById('femaleQty').value = '0';
         document.getElementById('totalQuantity').value = '0';
         document.getElementById('gregorianDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('supervisor').selectedIndex = 0;
-        document.getElementById('unitPrice').value = '';
+        document.getElementById('unitPrice').value = '1'; // تعيين القيمة الافتراضية إلى 1
         document.getElementById('totalPrice').value = '';
         document.getElementById('alertLabel').style.display = 'none';
         
@@ -263,21 +272,11 @@ class BarnApp {
             return;
         }
         
-        const unitPriceText = document.getElementById('unitPrice').value.trim();
-        if (!unitPriceText) {
-            alert('يرجى إدخال السعر الفردي.');
-            return;
-        }
-        
-        let unitPrice;
-        try {
-            unitPrice = parseFloat(unitPriceText);
-            if (unitPrice < 0) {
-                alert('السعر الفردي يجب أن يكون رقم موجب.');
-                return;
-            }
-        } catch (error) {
-            alert('يرجى إدخال سعر فردي صحيح.');
+        // التحقق من صحة السعر الفردي (الآن هو رقم مباشرة)
+        const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
+        if (unitPrice < 1) {
+            alert('السعر الفردي يجب أن يكون 1 أو أكثر.');
+            document.getElementById('unitPrice').focus();
             return;
         }
         
@@ -300,7 +299,7 @@ class BarnApp {
             تاريخ_الهجري: document.getElementById('hijriDate').value,
             تاريخ_الميلادي: document.getElementById('gregorianDate').value,
             المشرف: document.getElementById('supervisor').value,
-            السعر_الفردي: unitPrice,
+            السعر_الفردي: unitPrice, // الآن هو رقم مباشرة
             إجمالي_السعر: totalPrice,
             التنبيه: alertFlag,
             تاريخ_الإضافة: new Date().toISOString()
@@ -394,6 +393,14 @@ class BarnApp {
                 if ([3, 8, 9, 10].includes(index)) {
                     cell.style.backgroundColor = '#f8f9fa';
                     cell.style.textAlign = 'center';
+                    cell.style.fontWeight = 'bold';
+                    
+                    // تكبير خط الاستيعاب في الجدول أيضاً
+                    if (index === 3) {
+                        cell.style.fontSize = '14pt';
+                        cell.style.color = '#16a085';
+                        cell.style.background = 'linear-gradient(to bottom, #e8f6f3, #d1f2eb)';
+                    }
                 }
                 
                 row.appendChild(cell);
@@ -451,8 +458,8 @@ class BarnApp {
         document.getElementById('hijriDate').value = barn.تاريخ_الهجري;
         document.getElementById('gregorianDate').value = barn.تاريخ_الميلادي;
         document.getElementById('supervisor').value = barn.المشرف;
-        document.getElementById('unitPrice').value = barn.السعر_الفردي;
-        document.getElementById('totalPrice').value = barn.إجمالي_السعر;
+        document.getElementById('unitPrice').value = barn.السعر_الفردي || 1; // القيمة الافتراضية 1 إذا كانت غير موجودة
+        document.getElementById('totalPrice').value = this.formatPrice(barn.إجمالي_السعر);
         
         this.updateDayName();
         this.checkCapacity();

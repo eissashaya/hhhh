@@ -107,8 +107,9 @@ body {
 }
 
 .column:nth-child(3) {
-    border: 2px solid #9b59b6;
+    border: 3px solid #8e44ad;
     background: linear-gradient(to bottom, #f4ecf7, #e8daef);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .column:nth-child(4) {
@@ -117,8 +118,9 @@ body {
 }
 
 .column:nth-child(5) {
-    border: 2px solid #f39c12;
+    border: 3px solid #f39c12;
     background: linear-gradient(to bottom, #fef5e7, #fdebd0);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .column h3 {
@@ -127,6 +129,20 @@ body {
     color: #2c3e50;
     border-bottom: 2px solid currentColor;
     padding-bottom: 5px;
+}
+
+.column:nth-child(3) h3 {
+    color: #8e44ad;
+    border-bottom: 3px solid #8e44ad;
+    font-size: 14pt;
+    padding-bottom: 8px;
+}
+
+.column:nth-child(5) h3 {
+    color: #f39c12;
+    border-bottom: 3px solid #f39c12;
+    font-size: 14pt;
+    padding-bottom: 8px;
 }
 
 .form-group {
@@ -138,6 +154,33 @@ body {
     margin-bottom: 5px;
     font-weight: bold;
     color: #2c3e50;
+    background: linear-gradient(to bottom, #34495e, #2c3e50);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #2c3e50;
+    color: white;
+    font-size: 10pt;
+}
+
+.form-group label[for="maleQty"],
+.form-group label[for="femaleQty"] {
+    background: linear-gradient(to bottom, #8e44ad, #9b59b6) !important;
+    border: 2px solid #8e44ad !important;
+    color: white;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 12pt;
+}
+
+.form-group label[for="unitPrice"] {
+    background: linear-gradient(to bottom, #f39c12, #e67e22) !important;
+    border: 2px solid #f39c12 !important;
+    color: white;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 12pt;
 }
 
 .form-control {
@@ -156,18 +199,85 @@ body {
     outline: none;
 }
 
-#capacity, #totalQuantity {
+/* تكبير خط حقل الاستيعاب */
+#capacity {
+    font-size: 18pt !important;
+    font-weight: bold !important;
+    color: #16a085 !important;
+    background: linear-gradient(to bottom, #e8f6f3, #d1f2eb) !important;
+    border: 3px solid #1abc9c !important;
+    text-align: center;
+    padding: 12px !important;
+    height: 50px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+#totalQuantity {
     background-color: #e8f6f3;
     border: 2px solid #1abc9c;
     color: #16a085;
     font-weight: bold;
 }
 
+/* تحسين حقول الأعداد */
+#maleQty, #femaleQty {
+    border: 2px solid #9b59b6 !important;
+    background: linear-gradient(to bottom, #f4ecf7, #e8daef) !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    font-size: 12pt;
+    color: #8e44ad;
+    height: 45px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#maleQty:focus, #femaleQty:focus {
+    border-color: #8e44ad !important;
+    background: linear-gradient(to bottom, #e8daef, #d2b4de) !important;
+    outline: none;
+}
+
+/* تحسين مظهر حقل السعر الفردي الجديد */
+#unitPrice {
+    border: 2px solid #f39c12 !important;
+    background: linear-gradient(to bottom, #fef5e7, #fdebd0) !important;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    font-size: 12pt;
+    color: #e67e22;
+    height: 45px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#unitPrice:focus {
+    border-color: #e67e22 !important;
+    background: linear-gradient(to bottom, #fdebd0, #fad7a0) !important;
+    outline: none;
+}
+
+/* تحسين مظهر أزرار الزيادة والنقصان في العداد */
+#unitPrice::-webkit-inner-spin-button,
+#unitPrice::-webkit-outer-spin-button {
+    height: 30px;
+    opacity: 1;
+    margin: 0 5px;
+}
+
 #totalPrice {
-    background: linear-gradient(to bottom, #e8f4ff, #d6eaf8);
-    border: 2px solid #3498db;
+    background: linear-gradient(to bottom, #e8f4ff, #d6eaf8) !important;
+    border: 2px solid #3498db !important;
     color: #2980b9;
     font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    font-size: 12pt;
+    height: 45px;
+    border-radius: 8px;
 }
 
 #dayName {
@@ -356,6 +466,12 @@ body {
     .buttons-container {
         flex-direction: column;
     }
+    
+    #capacity {
+        font-size: 14pt !important;
+        padding: 8px !important;
+        height: 40px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -369,5 +485,11 @@ body {
     
     .stats-container {
         flex-direction: column;
+    }
+    
+    #capacity {
+        font-size: 12pt !important;
+        padding: 6px !important;
+        height: 35px;
     }
 }
