@@ -3,411 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة الحظائر - barnss</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #3498db;
-            --primary-dark: #2980b9;
-            --success: #27ae60;
-            --success-dark: #219a52;
-            --warning: #f39c12;
-            --warning-dark: #e67e22;
-            --danger: #e74c3c;
-            --danger-dark: #c0392b;
-            --purple: #9b59b6;
-            --purple-dark: #8e44ad;
-            --teal: #1abc9c;
-            --teal-dark: #16a085;
-            --dark: #2c3e50;
-            --dark-light: #34495e;
-            --gray: #95a5a6;
-            --gray-light: #ecf0f1;
-            --white: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #333;
-            min-height: 100vh;
-            padding: 20px;
-            direction: rtl;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .main-frame {
-            border: 3px solid var(--primary);
-            border-radius: 15px;
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 15px;
-        }
-
-        .back-btn {
-            background: linear-gradient(to bottom, var(--danger), var(--danger-dark));
-            color: white;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: 2px solid var(--danger);
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .back-btn:hover {
-            background: linear-gradient(to bottom, var(--danger-dark), var(--danger));
-            border: 2px solid var(--danger-dark);
-        }
-
-        .title {
-            background: linear-gradient(to right, var(--dark), var(--primary));
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            margin: 5px;
-            border: 2px solid var(--primary-dark);
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            flex-grow: 1;
-            margin-right: 15px;
-        }
-
-        .stats {
-            background: linear-gradient(to right, var(--success), var(--teal));
-            border-radius: 12px;
-            padding: 12px;
-            border: 2px solid var(--success);
-            margin-bottom: 15px;
-            display: flex;
-            gap: 20px;
-        }
-
-        .stat-item {
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .columns-container {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-
-        .column {
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .column-1 {
-            border: 2px solid var(--primary);
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-        }
-
-        .column-2 {
-            border: 2px solid var(--warning);
-            background: linear-gradient(to bottom, #fef9e7, #fcf3cf);
-        }
-
-        .column-3 {
-            border: 2px solid var(--purple);
-            background: linear-gradient(to bottom, #f4ecf7, #e8daef);
-        }
-
-        .column-4 {
-            border: 2px solid var(--teal);
-            background: linear-gradient(to bottom, #e8f6f3, #d1f2eb);
-        }
-
-        .column-5 {
-            border: 2px solid var(--warning);
-            background: linear-gradient(to bottom, #fef5e7, #fdebd0);
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            background: linear-gradient(to bottom, var(--dark-light), var(--dark));
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--dark);
-            font-weight: bold;
-            color: white;
-            font-size: 14px;
-            margin-bottom: 3px;
-        }
-
-        input, select {
-            background-color: var(--white);
-            border: 2px solid #dcdde1;
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        input:focus, select:focus {
-            border-color: var(--primary);
-            background-color: var(--gray-light);
-            outline: none;
-        }
-
-        .total-input {
-            background-color: #e8f6f3;
-            border: 2px solid var(--teal);
-            color: var(--teal-dark);
-            font-weight: bold;
-        }
-
-        .day-name {
-            background: linear-gradient(to bottom, var(--success), var(--success-dark));
-            border: 2px solid var(--success-dark);
-            border-radius: 8px;
-            padding: 8px;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: white;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .total-price {
-            background: linear-gradient(to bottom, #e8f4ff, #d6eaf8);
-            border: 2px solid var(--primary);
-            color: var(--primary-dark);
-            font-weight: bold;
-        }
-
-        .alert {
-            background: linear-gradient(to bottom, #ff6b6b, #ee5a52);
-            color: white;
-            padding: 10px;
-            border: 2px solid var(--danger);
-            border-radius: 8px;
-            margin-top: 5px;
-            text-align: center;
-            font-weight: bold;
-            display: none;
-        }
-
-        .buttons-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-            color: white;
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 2px solid var(--primary);
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 45px;
-        }
-
-        .btn:hover {
-            background: linear-gradient(to bottom, var(--primary-dark), var(--primary));
-            border: 2px solid var(--primary-dark);
-        }
-
-        .btn-new {
-            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-            border: 2px solid var(--primary);
-        }
-
-        .btn-save {
-            background: linear-gradient(to bottom, var(--success), var(--success-dark));
-            border: 2px solid var(--success);
-        }
-
-        .btn-view {
-            background: linear-gradient(to bottom, var(--purple), var(--purple-dark));
-            border: 2px solid var(--purple);
-        }
-
-        .btn-delete {
-            background: linear-gradient(to bottom, var(--danger), var(--danger-dark));
-            border: 2px solid var(--danger);
-        }
-
-        .table-container {
-            background: var(--white);
-            border: 2px solid var(--dark);
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .table-title {
-            background: linear-gradient(to right, var(--dark), var(--dark-light));
-            color: white;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 5px;
-            border: 2px solid var(--dark);
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th {
-            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            padding: 8px;
-            text-align: center;
-            border-right: 1px solid var(--primary-dark);
-        }
-
-        th:last-child {
-            border-right: none;
-        }
-
-        td {
-            padding: 6px;
-            border-bottom: 1px solid #ecf0f1;
-            text-align: center;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-
-        tr:hover {
-            background-color: #e3f2fd;
-        }
-
-        tr.selected {
-            background-color: #bbdefb;
-        }
-
-        @media (max-width: 1200px) {
-            .columns-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 900px) {
-            .columns-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .buttons-container {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .columns-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .buttons-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .title {
-                margin-right: 0;
-            }
-        }
-    </style>
+    <title>🏠 نظام إدارة الحظائر</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <div class="main-frame">
-            <div class="header">
-                <button class="back-btn"><i class="fas fa-arrow-left"></i> الرجوع</button>
-                <div class="title"><i class="fas fa-home"></i> نظام إدارة الحظائر  </div>
-            </div>
+        <!-- رأس الصفحة -->
+        <header class="header">
+            <button id="backBtn" class="back-btn">⬅ الرجوع</button>
+            <h1 class="title">🏠 نظام إدارة الحظائر</h1>
+        </header>
 
-            <div class="stats">
-                <div class="stat-item" id="total-barns">عدد الحظائر: 0</div>
-                <div class="stat-item" id="total-animals">إجمالي الحيوانات: 0</div>
+        <!-- الإحصائيات -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <span id="totalBarns">عدد الحظائر: 0</span>
             </div>
+            <div class="stat-card">
+                <span id="totalAnimals">إجمالي الحيوانات: 0</span>
+            </div>
+        </div>
 
-            <div class="columns-container">
+        <!-- نموذج إدخال البيانات -->
+        <div class="form-container">
+            <div class="form-columns">
                 <!-- العمود الأول: معلومات الحظيرة -->
-                <div class="column column-1">
+                <div class="column">
+                    <h3>معلومات الحظيرة</h3>
                     <div class="form-group">
-                        <label for="barn-number">رقم الحظيرة:</label>
-                        <select id="barn-number">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
+                        <label for="barnNumber">رقم الحظيرة:</label>
+                        <select id="barnNumber" class="form-control">
+                            <!-- سيتم ملؤه بالجافاسكريبت -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="barn-name">اسم الحظيرة:</label>
-                        <input type="text" id="barn-name">
+                        <label for="barnName">اسم الحظيرة:</label>
+                        <input type="text" id="barnName" class="form-control">
                     </div>
                     <div class="form-group">
                         <label for="capacity">الاستيعاب:</label>
-                        <input type="number" id="capacity" min="0" value="0">
+                        <input type="number" id="capacity" class="form-control" readonly>
                     </div>
                 </div>
 
                 <!-- العمود الثاني: معلومات الحيوانات -->
-                <div class="column column-2">
+                <div class="column">
+                    <h3>معلومات الحيوانات</h3>
                     <div class="form-group">
-                        <label for="animal-type">الصنف:</label>
-                        <select id="animal-type">
+                        <label for="animalType">الصنف:</label>
+                        <select id="animalType" class="form-control">
                             <option value="أغنام">أغنام</option>
                             <option value="أبقار">أبقار</option>
                             <option value="ماعز">ماعز</option>
@@ -416,16 +60,13 @@
                     </div>
                     <div class="form-group">
                         <label for="gender">النوع:</label>
-                        <select id="gender">
-                            <option value="حري">حري</option>
-                            <option value="نعيمي">نعيمي</option>
-                            <option value="نجدي">نجدي</option>
-                            <option value="شامي">شامي</option>
+                        <select id="gender" class="form-control">
+                            <!-- سيتم ملؤه بالجافاسكريبت -->
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="location">الموقع:</label>
-                        <select id="location">
+                        <select id="location" class="form-control">
                             <option value="شمال المزرعة">شمال المزرعة</option>
                             <option value="جنوب المزرعة">جنوب المزرعة</option>
                             <option value="شرق المزرعة">شرق المزرعة</option>
@@ -436,38 +77,40 @@
                 </div>
 
                 <!-- العمود الثالث: الكميات -->
-                <div class="column column-3">
+                <div class="column">
+                    <h3>الكميات</h3>
                     <div class="form-group">
-                        <label for="male-qty">كمية الذكور:</label>
-                        <input type="number" id="male-qty" min="0" value="0">
+                        <label for="maleQty">كمية الذكور:</label>
+                        <input type="number" id="maleQty" class="form-control" min="0" value="0">
                     </div>
                     <div class="form-group">
-                        <label for="female-qty">كمية الإناث:</label>
-                        <input type="number" id="female-qty" min="0" value="0">
+                        <label for="femaleQty">كمية الإناث:</label>
+                        <input type="number" id="femaleQty" class="form-control" min="0" value="0">
                     </div>
                     <div class="form-group">
-                        <label for="total-quantity">الإجمالي:</label>
-                        <input type="number" id="total-quantity" min="0" value="0" class="total-input" readonly>
+                        <label for="totalQuantity">الإجمالي:</label>
+                        <input type="number" id="totalQuantity" class="form-control" readonly>
                     </div>
                 </div>
 
                 <!-- العمود الرابع: التواريخ والمشرف -->
-                <div class="column column-4">
+                <div class="column">
+                    <h3>التواريخ والمشرف</h3>
                     <div class="form-group">
-                        <label for="hijri-date">التاريخ الهجري:</label>
-                        <input type="text" id="hijri-date" readonly>
+                        <label for="hijriDate">التاريخ الهجري:</label>
+                        <input type="text" id="hijriDate" class="form-control" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="gregorian-date">تاريخ الشراء:</label>
-                        <input type="date" id="gregorian-date">
+                        <label for="gregorianDate">تاريخ الشراء:</label>
+                        <input type="date" id="gregorianDate" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>اسم اليوم:</label>
-                        <div class="day-name" id="day-name"></div>
+                        <label for="dayName">اسم اليوم:</label>
+                        <input type="text" id="dayName" class="form-control" readonly>
                     </div>
                     <div class="form-group">
                         <label for="supervisor">المشرف على العملية:</label>
-                        <select id="supervisor">
+                        <select id="supervisor" class="form-control">
                             <option value="عيسى شايع">عيسى شايع</option>
                             <option value="محمد أحمد">محمد أحمد</option>
                             <option value="خالد سالم">خالد سالم</option>
@@ -477,481 +120,62 @@
                 </div>
 
                 <!-- العمود الخامس: الأسعار والتنبيه -->
-                <div class="column column-5">
+                <div class="column">
+                    <h3>الأسعار والتنبيه</h3>
                     <div class="form-group">
-                        <label for="unit-price">السعر الفردي:</label>
-                        <input type="number" id="unit-price" min="0" step="0.01" value="0">
+                        <label for="unitPrice">السعر الفردي:</label>
+                        <input type="number" id="unitPrice" class="form-control" min="0" step="0.01" placeholder="أدخل السعر الفردي...">
                     </div>
                     <div class="form-group">
-                        <label for="total-price">إجمالي السعر:</label>
-                        <input type="number" id="total-price" min="0" step="0.01" value="0" class="total-price" readonly>
+                        <label for="totalPrice">إجمالي السعر:</label>
+                        <input type="text" id="totalPrice" class="form-control" readonly placeholder="سيتم حسابه تلقائياً">
                     </div>
-                    <div class="alert" id="alert-label">⚠️ تنبيه: العدد يتجاوز السعة</div>
+                    <div id="alertLabel" class="alert-label" style="display: none;"></div>
                 </div>
             </div>
+        </div>
 
-            <div class="buttons-container">
-                <button class="btn btn-new"><i class="fas fa-plus"></i> جديد</button>
-                <button class="btn btn-save"><i class="fas fa-save"></i> حفظ</button>
-                <button class="btn btn-view"><i class="fas fa-chart-bar"></i> عرض البيانات</button>
-                <button class="btn btn-delete"><i class="fas fa-trash"></i> حذف</button>
-                <button class="btn btn-export"><i class="fas fa-download"></i> تصدير</button>
-                <button class="btn btn-import"><i class="fas fa-upload"></i> استيراد</button>
-            </div>
+        <!-- أزرار العمليات -->
+        <div class="buttons-container">
+            <button id="btnNew" class="btn btn-new">🆕 جديد</button>
+            <button id="btnSave" class="btn btn-save">💾 حفظ</button>
+            <button id="btnView" class="btn btn-view">📊 عرض البيانات</button>
+            <button id="btnDelete" class="btn btn-delete">🗑️ حذف</button>
+        </div>
 
-            <div class="table-container">
-                <div class="table-title"><i class="fas fa-table"></i> بيانات الحظائر</div>
-                <table id="barns-table">
-                    <thead>
-                        <tr>
-                            <th>رقم الحظيرة</th>
-                            <th>اسم الحظيرة</th>
-                            <th>تاريخ الشراء</th>
-                            <th>الاستيعاب</th>
-                            <th>الصنف</th>
-                            <th>اليوم/الشهر</th>
-                            <th>النوع</th>
-                            <th>الموقع</th>
-                            <th>كمية ذكور</th>
-                            <th>كمية إناث</th>
-                            <th>الإجمالي</th>
-                            <th>السعر الفردي</th>
-                            <th>إجمالي السعر</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body">
-                        <!-- سيتم ملء البيانات بواسطة JavaScript -->
-                    </tbody>
-                </table>
+        <!-- جدول البيانات -->
+        <div class="table-container">
+            <h2>📊 بيانات الحظائر</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="بحث في الحظائر..." class="search-input">
+                <button id="searchBtn" class="btn btn-search">🔍 بحث</button>
             </div>
+            <table id="barnsTable" class="barns-table">
+                <thead>
+                    <tr>
+                        <th>رقم الحظيرة</th>
+                        <th>اسم الحظيرة</th>
+                        <th>تاريخ الشراء</th>
+                        <th>الاستيعاب</th>
+                        <th>الصنف</th>
+                        <th>اليوم/الشهر</th>
+                        <th>النوع</th>
+                        <th>الموقع</th>
+                        <th>كمية ذكور</th>
+                        <th>كمية إناث</th>
+                        <th>الإجمالي</th>
+                        <th>السعر الفردي</th>
+                        <th>إجمالي السعر</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="barnsTableBody">
+                    <!-- سيتم ملؤه بالجافاسكريبت -->
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <script>
-        // البيانات المحفوظة محلياً
-        let barnsData = [];
-        let currentEditId = null;
-
-        // أنواع الحيوانات لكل صنف
-        const animalTypesMapping = {
-            "أغنام": ["حري", "نعيمي", "نجدي", "شامي"],
-            "أبقار": ["بلدي", "هولشتاين", "ساحلي"],
-            "ماعز": ["شامي", "سعادي", "حيسي"],
-            "جمال": ["مجاهيم", "شعل", "وضح"]
-        };
-
-        // أسماء الحظائر والمواقع التلقائية
-        const barnData = {
-            "1": { name: "الحظيرة الأولى", location: "شمال المزرعة" },
-            "2": { name: "الحظيرة الثانية", location: "جنوب المزرعة" },
-            "3": { name: "الحظيرة الثالثة", location: "شرق المزرعة" },
-            "4": { name: "الحظيرة الرابعة", location: "غرب المزرعة" },
-            "5": { name: "الحظيرة الخامسة", location: "وسط المزرعة" }
-        };
-
-        // تحويل التاريخ الميلادي إلى هجري (وهمي)
-        function convertToHijri(gregorianDate) {
-            // في التطبيق الحقيقي، سيتم استخدام مكتبة للتحويل
-            return "1445/03/01";
-        }
-
-        // الحصول على اسم اليوم باللغة العربية
-        function getDayNameArabic(date) {
-            const days = {
-                0: "الأحد",
-                1: "الاثنين",
-                2: "الثلاثاء",
-                3: "الأربعاء",
-                4: "الخميس",
-                5: "الجمعة",
-                6: "السبت"
-            };
-            return days[date.getDay()];
-        }
-
-        // توليد معرف فريد لكل حظيرة
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        // حفظ البيانات في localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('barnsData', JSON.stringify(barnsData));
-        }
-
-        // تحميل البيانات من localStorage
-        function loadFromLocalStorage() {
-            const savedData = localStorage.getItem('barnsData');
-            if (savedData) {
-                barnsData = JSON.parse(savedData);
-            }
-        }
-
-        // تحديث أنواع الحيوانات بناءً على الصنف المختار
-        function updateAnimalTypes() {
-            const selectedAnimal = document.getElementById('animal-type').value;
-            const genderSelect = document.getElementById('gender');
-            
-            // مسح الخيارات الحالية
-            genderSelect.innerHTML = '';
-            
-            // إضافة الخيارات الجديدة
-            if (animalTypesMapping[selectedAnimal]) {
-                animalTypesMapping[selectedAnimal].forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    genderSelect.appendChild(option);
-                });
-            }
-        }
-
-        // تحديث الإجماليات تلقائياً
-        function updateTotals() {
-            const maleQty = parseInt(document.getElementById('male-qty').value) || 0;
-            const femaleQty = parseInt(document.getElementById('female-qty').value) || 0;
-            const unitPrice = parseFloat(document.getElementById('unit-price').value) || 0;
-            
-            const totalQty = maleQty + femaleQty;
-            const totalPrice = unitPrice * totalQty;
-            
-            document.getElementById('total-quantity').value = totalQty;
-            document.getElementById('total-price').value = totalPrice.toFixed(2);
-            
-            // التحقق من السعة
-            checkCapacity();
-        }
-
-        // التحقق من تجاوز سعة الحظيرة
-        function checkCapacity() {
-            const totalAnimals = parseInt(document.getElementById('total-quantity').value) || 0;
-            const capacity = parseInt(document.getElementById('capacity').value) || 0;
-            const alertLabel = document.getElementById('alert-label');
-            
-            if (capacity > 0 && totalAnimals > capacity) {
-                alertLabel.textContent = `⚠️ تنبيه: العدد ${totalAnimals} يتجاوز السعة ${capacity}`;
-                alertLabel.style.display = 'block';
-            } else {
-                alertLabel.style.display = 'none';
-            }
-        }
-
-        // تحديث التاريخ الهجري واسم اليوم
-        function updateDateInfo() {
-            const gregorianDate = document.getElementById('gregorian-date').value;
-            const dateObj = new Date(gregorianDate);
-            
-            // تحديث التاريخ الهجري
-            document.getElementById('hijri-date').value = convertToHijri(dateObj);
-            
-            // تحديث اسم اليوم
-            document.getElementById('day-name').textContent = getDayNameArabic(dateObj);
-        }
-
-        // تحديث اسم الحظيرة والموقع تلقائياً بناءً على الرقم المختار
-        function updateBarnData() {
-            const selectedNumber = document.getElementById('barn-number').value;
-            
-            if (barnData[selectedNumber]) {
-                document.getElementById('barn-name').value = barnData[selectedNumber].name;
-                
-                const locationSelect = document.getElementById('location');
-                for (let i = 0; i < locationSelect.options.length; i++) {
-                    if (locationSelect.options[i].value === barnData[selectedNumber].location) {
-                        locationSelect.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // تحديث الإحصائيات
-        function updateStatistics() {
-            const totalBarns = barnsData.length;
-            const totalAnimals = barnsData.reduce((sum, barn) => sum + barn.totalQty, 0);
-            
-            document.getElementById('total-barns').textContent = `عدد الحظائر: ${totalBarns}`;
-            document.getElementById('total-animals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
-        }
-
-        // مسح جميع الحقول
-        function clearFields() {
-            document.getElementById('barn-number').selectedIndex = 0;
-            document.getElementById('barn-name').value = '';
-            document.getElementById('capacity').value = 0;
-            document.getElementById('animal-type').selectedIndex = 0;
-            document.getElementById('gender').selectedIndex = 0;
-            document.getElementById('location').selectedIndex = 0;
-            document.getElementById('male-qty').value = 0;
-            document.getElementById('female-qty').value = 0;
-            document.getElementById('total-quantity').value = 0;
-            document.getElementById('unit-price').value = 0;
-            document.getElementById('total-price').value = 0;
-            document.getElementById('alert-label').style.display = 'none';
-            document.getElementById('supervisor').selectedIndex = 0;
-            
-            // تحديث أنواع الحيوانات
-            updateAnimalTypes();
-            
-            // تحديث التاريخ
-            const today = new Date();
-            document.getElementById('gregorian-date').valueAsDate = today;
-            updateDateInfo();
-            
-            // تحديث بيانات الحظيرة
-            updateBarnData();
-            
-            // إعادة تعيين معرف التعديل
-            currentEditId = null;
-        }
-
-        // جمع البيانات من النموذج
-        function collectFormData() {
-            return {
-                id: currentEditId || generateId(),
-                barnNumber: document.getElementById('barn-number').value,
-                barnName: document.getElementById('barn-name').value,
-                purchaseDate: document.getElementById('gregorian-date').value,
-                capacity: parseInt(document.getElementById('capacity').value) || 0,
-                animalType: document.getElementById('animal-type').value,
-                dayMonth: document.getElementById('hijri-date').value,
-                gender: document.getElementById('gender').value,
-                location: document.getElementById('location').value,
-                maleQty: parseInt(document.getElementById('male-qty').value) || 0,
-                femaleQty: parseInt(document.getElementById('female-qty').value) || 0,
-                totalQty: parseInt(document.getElementById('total-quantity').value) || 0,
-                unitPrice: parseFloat(document.getElementById('unit-price').value) || 0,
-                totalPrice: parseFloat(document.getElementById('total-price').value) || 0,
-                supervisor: document.getElementById('supervisor').value
-            };
-        }
-
-        // حفظ البيانات
-        function saveBarn() {
-            const barnData = collectFormData();
-            const barnName = barnData.barnName.trim();
-            
-            if (!barnName) {
-                alert('يرجى إدخال اسم الحظيرة.');
-                return;
-            }
-            
-            if (barnData.totalQty === 0) {
-                alert('يرجى إدخال كمية الحيوانات.');
-                return;
-            }
-            
-            // التحقق من وجود حظيرة بنفس الرقم
-            const existingBarnIndex = barnsData.findIndex(barn => 
-                barn.id === currentEditId || barn.barnNumber === barnData.barnNumber
-            );
-            
-            if (existingBarnIndex >= 0 && barnsData[existingBarnIndex].id !== currentEditId) {
-                alert('يوجد حظيرة أخرى بنفس الرقم. يرجى اختيار رقم مختلف.');
-                return;
-            }
-            
-            if (currentEditId) {
-                // تعديل حظيرة موجودة
-                const index = barnsData.findIndex(barn => barn.id === currentEditId);
-                if (index >= 0) {
-                    barnsData[index] = barnData;
-                }
-            } else {
-                // إضافة حظيرة جديدة
-                barnsData.push(barnData);
-            }
-            
-            // حفظ البيانات في localStorage
-            saveToLocalStorage();
-            
-            // إعادة تحميل البيانات
-            loadData();
-            clearFields();
-            
-            alert('تم حفظ البيانات بنجاح!');
-        }
-
-        // حذف الحظيرة
-        function deleteBarn() {
-            if (!currentEditId) {
-                alert('يرجى اختيار حظيرة للحذف.');
-                return;
-            }
-            
-            if (confirm('هل تريد حذف الحظيرة المحددة؟')) {
-                barnsData = barnsData.filter(barn => barn.id !== currentEditId);
-                
-                // حفظ البيانات في localStorage
-                saveToLocalStorage();
-                
-                // إعادة تحميل البيانات
-                loadData();
-                clearFields();
-                
-                alert('تم حذف الحظيرة بنجاح!');
-            }
-        }
-
-        // تصدير البيانات
-        function exportData() {
-            const dataStr = JSON.stringify(barnsData, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = 'barns_data.json';
-            link.click();
-        }
-
-        // استيراد البيانات
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(event) {
-                    try {
-                        const importedData = JSON.parse(event.target.result);
-                        
-                        if (Array.isArray(importedData)) {
-                            barnsData = importedData;
-                            saveToLocalStorage();
-                            loadData();
-                            alert('تم استيراد البيانات بنجاح!');
-                        } else {
-                            alert('ملف غير صالح. يرجى اختيار ملف JSON صحيح.');
-                        }
-                    } catch (error) {
-                        alert('خطأ في قراءة الملف. يرجى التأكد من صحة الملف.');
-                    }
-                };
-                
-                reader.readAsText(file);
-            };
-            
-            input.click();
-        }
-
-        // تحميل البيانات في الجدول
-        function loadData() {
-            const tableBody = document.getElementById('table-body');
-            tableBody.innerHTML = '';
-            
-            barnsData.forEach(barn => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${barn.barnNumber}</td>
-                    <td>${barn.barnName}</td>
-                    <td>${barn.purchaseDate}</td>
-                    <td>${barn.capacity}</td>
-                    <td>${barn.animalType}</td>
-                    <td>${barn.dayMonth}</td>
-                    <td>${barn.gender}</td>
-                    <td>${barn.location}</td>
-                    <td>${barn.maleQty}</td>
-                    <td>${barn.femaleQty}</td>
-                    <td>${barn.totalQty}</td>
-                    <td>${barn.unitPrice.toFixed(2)} ريال</td>
-                    <td>${barn.totalPrice.toFixed(2)} ريال</td>
-                `;
-                
-                // إضافة حدث النقر على الصف
-                row.addEventListener('click', () => {
-                    // إزالة التحديد من جميع الصفوف
-                    document.querySelectorAll('#table-body tr').forEach(r => {
-                        r.classList.remove('selected');
-                    });
-                    
-                    // تحديد الصف الحالي
-                    row.classList.add('selected');
-                    
-                    // تحميل بيانات الصف المحدد في الحقول
-                    loadSelectedRow(barn);
-                });
-                
-                tableBody.appendChild(row);
-            });
-            
-            // تحديث الإحصائيات
-            updateStatistics();
-        }
-
-        // تحميل بيانات الصف المحدد في الحقول
-        function loadSelectedRow(barn) {
-            document.getElementById('barn-number').value = barn.barnNumber;
-            document.getElementById('barn-name').value = barn.barnName;
-            document.getElementById('capacity').value = barn.capacity;
-            document.getElementById('animal-type').value = barn.animalType;
-            document.getElementById('gender').value = barn.gender;
-            document.getElementById('location').value = barn.location;
-            document.getElementById('male-qty').value = barn.maleQty;
-            document.getElementById('female-qty').value = barn.femaleQty;
-            document.getElementById('total-quantity').value = barn.totalQty;
-            document.getElementById('unit-price').value = barn.unitPrice;
-            document.getElementById('total-price').value = barn.totalPrice;
-            document.getElementById('gregorian-date').value = barn.purchaseDate;
-            document.getElementById('supervisor').value = barn.supervisor || 'عيسى شايع';
-            
-            // تحديث التاريخ الهجري واسم اليوم
-            updateDateInfo();
-            
-            // تحديث أنواع الحيوانات بناءً على الصنف المختار
-            updateAnimalTypes();
-            
-            // تعيين معرف التعديل
-            currentEditId = barn.id;
-            
-            // التحقق من السعة
-            checkCapacity();
-        }
-
-        // تهيئة التطبيق
-        function initApp() {
-            // تحميل البيانات من localStorage
-            loadFromLocalStorage();
-            
-            // تعيين التاريخ الحالي
-            const today = new Date();
-            document.getElementById('gregorian-date').valueAsDate = today;
-            
-            // تحديث البيانات الأولية
-            updateDateInfo();
-            updateAnimalTypes();
-            updateBarnData();
-            updateStatistics();
-            
-            // تحميل البيانات
-            loadData();
-            
-            // إضافة المستمعين للأحداث
-            document.getElementById('animal-type').addEventListener('change', updateAnimalTypes);
-            document.getElementById('male-qty').addEventListener('input', updateTotals);
-            document.getElementById('female-qty').addEventListener('input', updateTotals);
-            document.getElementById('unit-price').addEventListener('input', updateTotals);
-            document.getElementById('capacity').addEventListener('input', checkCapacity);
-            document.getElementById('gregorian-date').addEventListener('change', updateDateInfo);
-            document.getElementById('barn-number').addEventListener('change', updateBarnData);
-            
-            // أزرار العمليات
-            document.querySelector('.btn-new').addEventListener('click', clearFields);
-            document.querySelector('.btn-save').addEventListener('click', saveBarn);
-            document.querySelector('.btn-view').addEventListener('click', loadData);
-            document.querySelector('.btn-delete').addEventListener('click', deleteBarn);
-            document.querySelector('.btn-export').addEventListener('click', exportData);
-            document.querySelector('.btn-import').addEventListener('click', importData);
-            document.querySelector('.back-btn').addEventListener('click', () => {
-                alert('الرجوع للقائمة الرئيسية');
-            });
-        }
-
-        // تشغيل التطبيق عند تحميل الصفحة
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
