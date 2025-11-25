@@ -4,13 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🐑 برنامج مزارع سحاب النموذجية لتربية المواشي</title>
+    
+    <!-- استيراد خط GE Dinar One -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <style>
         /* أنماط عامة */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'GE Dinar One', 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
@@ -503,6 +509,34 @@
                 grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             }
         }
+
+        /* استيراد وتطبيق خط GE Dinar One */
+        @font-face {
+            font-family: 'GE Dinar One';
+            src: url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Light.woff2') format('woff2'),
+                 url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Light.woff') format('woff');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            src: url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Medium.woff2') format('woff2'),
+                 url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Medium.woff') format('woff');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'GE Dinar One';
+            src: url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Bold.woff2') format('woff2'),
+                 url('https://cdn.rawgit.com/mohammadkamal/GE-Dinar-One/fonts/GEDinarOne-Bold.woff') format('woff');
+            font-weight: 700;
+            font-style: normal;
+            font-display: swap;
+        }
     </style>
 </head>
 <body>
@@ -679,7 +713,7 @@
         // تحديث الوقت والتاريخ
         function updateDateTime() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString('ar-EG');
+            const timeString = now.toLocaleTimeString('ar-EG', {hour12: false});
             const dateString = now.toLocaleDateString('ar-EG', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -841,10 +875,7 @@
             updateDateTime();
             updateStatistics();
             
-            // تحديث الوقت كل ثانية
-            setInterval(updateDateTime, 1000);
-            
-            // تحديث الإحصائيات كل 30 ثانية
+            // تحديث الإحصائيات كل 30 ثانية فقط
             setInterval(updateStatistics, 30000);
         };
     </script>
