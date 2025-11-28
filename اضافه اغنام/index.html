@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الأغنام</title>
+    <style>
+        /* التنسيقات العامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 3px solid #2a5298;
+        }
+
+        /* العنوان الرئيسي */
+        .header {
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #1e3c72;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid #e74c3c;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #a93226);
+            border-color: #c0392b;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* مجموعة اختيار الحظيرة */
+        .barn-select-group {
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #2a5298;
+        }
+
+        .barn-select-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .barn-select-container label {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .barn-select {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            background: white;
+            color: #1e3c72;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(to bottom, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid white;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(to bottom, #2a5298, #1e3c72);
+        }
+
+        /* قسم المحتوى المقسوم */
+        .split-content {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .left-panel {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-panel {
+            flex: 2;
+            min-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* مجموعة المعلومات */
+        .info-group {
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #2a5298;
+            display: none;
+        }
+
+        .info-group.visible {
+            display: block;
+        }
+
+        .info-group h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            font-size: 14px;
+            background: #1e3c72;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .info-value {
+            background: white;
+            color: #1e3c72;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            border: 2px solid #1e3c72;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* مجموعة الأزرار */
+        .buttons-group {
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #2a5298;
+        }
+
+        .buttons-group h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            border: 2px solid white;
+        }
+
+        .add-quantity-btn {
+            background: linear-gradient(to bottom, #1e3c72, #2a5298);
+            color: white;
+        }
+
+        .add-quantity-btn:hover {
+            background: linear-gradient(to bottom, #2a5298, #1e3c72);
+        }
+
+        .empty-barn-btn {
+            background: linear-gradient(to bottom, #e67e22, #d35400);
+            color: white;
+        }
+
+        .empty-barn-btn:hover {
+            background: linear-gradient(to bottom, #d35400, #e67e22);
+        }
+
+        .delete-barn-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .delete-barn-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #e74c3c);
+        }
+
+        .action-btn:disabled {
+            background: #bdc3c7;
+            border-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* مجموعة جدول الأغنام */
+        .sheep-group {
+            background: linear-gradient(to right, #2a5298, #1e3c72);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #2a5298;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sheep-group h2 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .table-container {
+            flex: 1;
+            border: 2px solid #1e3c72;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+
+        .table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            min-width: 800px;
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th {
+            background: linear-gradient(to bottom, #1e3c72, #2a5298);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            border-right: 1px solid #2a5298;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ecf0f1;
+            text-align: center;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tr:hover {
+            background-color: #e3f2fd;
+            cursor: pointer;
+        }
+
+        /* ملخص الأعداد */
+        .summary-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .summary-item {
+            background: #1e3c72;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+
+        /* تخصيص شريط التمرير */
+        .table-wrapper::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #1e3c72;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #2a5298;
+        }
+
+        /* نافذة إدخال الكمية */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            overflow: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 15px;
+            border: 3px solid #2a5298;
+            width: 90%;
+            max-width: 1000px;
+            color: white;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .modal-sections {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .modal-section {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #2a5298;
+        }
+
+        .modal-section h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #1e3c72;
+            border-radius: 8px;
+            background: white;
+            color: #1e3c72;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            border: 2px solid white;
+        }
+
+        .save-btn {
+            background: linear-gradient(to bottom, #27ae60, #219a52);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: linear-gradient(to bottom, #219a52, #27ae60);
+        }
+
+        .generate-btn {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+        }
+
+        .generate-btn:hover {
+            background: linear-gradient(to bottom, #2980b9, #3498db);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #e74c3c);
+        }
+
+        /* شريط التقدم */
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .split-content {
+                flex-direction: column;
+            }
+            
+            .left-panel, .right-panel {
+                min-width: 100%;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .barn-select-container {
+                flex-direction: column;
+            }
+            
+            .summary-container {
+                flex-direction: column;
+            }
+            
+            .modal-sections {
+                flex-direction: column;
+            }
+        }
+
+        /* رسالة عدم وجود بيانات */
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #bdc3c7;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* تنبيهات */
+        .alert {
+            background: linear-gradient(to bottom, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 12px;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* رسائل النجاح والخطأ */
+        .success-message {
+            display: none;
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: none;
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- العنوان وزر الرجوع -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">⬅ الرجوع للقائمة الرئيسية</button>
+            <h1>🐑 نظام إدارة الأغنام</h1>
+        </div>
+
+        <!-- رسائل النظام -->
+        <div class="success-message" id="success-message"></div>
+        <div class="error-message" id="error-message"></div>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <!-- مجموعة اختيار الحظيرة -->
+            <div class="barn-select-group">
+                <div class="barn-select-container">
+                    <label for="barn-select">اختر الحظيرة:</label>
+                    <select id="barn-select" class="barn-select">
+                        <option value="">-- اختر حظيرة --</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadBarns()">🔄 تحديث</button>
+                </div>
+            </div>
+
+            <!-- المحتوى المقسوم -->
+            <div class="split-content">
+                <!-- اللوحة اليسرى (40%) -->
+                <div class="left-panel">
+                    <!-- معلومات الحظيرة -->
+                    <div class="info-group" id="barn-info">
+                        <h2>📊 بيانات الحظيرة</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">رقم الحظيرة:</div>
+                                <div class="info-value" id="barn-number">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">اسم الحظيرة:</div>
+                                <div class="info-value" id="barn-name">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">الاستيعاب الكلي:</div>
+                                <div class="info-value" id="total-capacity">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">السعة المستخدمة:</div>
+                                <div class="info-value" id="used-capacity">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">السعة المتبقية:</div>
+                                <div class="info-value" id="remaining-capacity">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">الموقع:</div>
+                                <div class="info-value" id="barn-location">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">الصنف:</div>
+                                <div class="info-value" id="barn-breed">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">النوع:</div>
+                                <div class="info-value" id="barn-type">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">تاريخ الشراء:</div>
+                                <div class="info-value" id="purchase-date">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">عدد الذكور:</div>
+                                <div class="info-value" id="male-count">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">عدد الإناث:</div>
+                                <div class="info-value" id="female-count">-</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">السعر الفردي:</div>
+                                <div class="info-value" id="unit-price">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- أزرار التحكم -->
+                    <div class="buttons-group">
+                        <h2>⚙️ إجراءات الحظيرة</h2>
+                        <div class="action-buttons">
+                            <button class="action-btn add-quantity-btn" id="add-quantity-btn" onclick="openAddQuantityModal()" disabled>💰 إدخال الكمية</button>
+                            <button class="action-btn empty-barn-btn" id="empty-barn-btn" onclick="emptyCurrentBarn()" disabled>🗑️ إفراغ الحظيرة</button>
+                            <button class="action-btn delete-barn-btn" id="delete-barn-btn" onclick="deleteCurrentBarn()" disabled>❌ حذف الحظيرة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- اللوحة اليمنى (60%) -->
+                <div class="right-panel">
+                    <!-- جدول الأغنام -->
+                    <div class="sheep-group">
+                        <h2>🐑 الأغنام في الحظيرة</h2>
+                        <div class="table-container">
+                            <div class="table-wrapper">
+                                <table class="data-table" id="sheep-table">
+                                    <thead>
+                                        <tr>
+                                            <th>كود الأم</th>
+                                            <th>كود الحظيرة</th>
+                                            <th>النوع</th>
+                                            <th>الصنف</th>
+                                            <th>الجنس</th>
+                                            <th>تاريخ الشراء</th>
+                                            <th>القيمة</th>
+                                            <th>الموقع</th>
+                                            <th>التكرار</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sheep-table-body">
+                                        <!-- سيتم ملء البيانات هنا -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <!-- ملخص الأعداد -->
+                        <div class="summary-container">
+                            <div class="summary-item" id="total-sheep">إجمالي الأغنام: 0</div>
+                            <div class="summary-item" id="total-males">الذكور: 0</div>
+                            <div class="summary-item" id="total-females">الإناث: 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إدخال الكمية -->
+    <div id="quantity-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeAddQuantityModal()">✕</button>
+            <h2 class="modal-title" id="modal-title">إدخال كمية الأغنام</h2>
+            
+            <div class="modal-sections">
+                <!-- قسم معلومات الحظيرة -->
+                <div class="modal-section">
+                    <h3>📊 بيانات الحظيرة الحالية</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">اسم الحظيرة:</div>
+                            <div class="info-value" id="modal-barn-name">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">الموقع:</div>
+                            <div class="info-value" id="modal-barn-location">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">الصنف:</div>
+                            <div class="info-value" id="modal-barn-breed">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">النوع:</div>
+                            <div class="info-value" id="modal-barn-type">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">عدد الذكور الحالي:</div>
+                            <div class="info-value" id="modal-male-count">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">عدد الإناث الحالي:</div>
+                            <div class="info-value" id="modal-female-count">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">السعر الفردي:</div>
+                            <div class="info-value" id="modal-unit-price">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">تاريخ الشراء:</div>
+                            <div class="info-value" id="modal-purchase-date">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">السعة المستخدمة:</div>
+                            <div class="info-value" id="modal-used-capacity">-</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">السعة المتبقية:</div>
+                            <div class="info-value" id="modal-remaining-capacity">-</div>
+                        </div>
+                        <div class="alert" id="modal-alert"></div>
+                         <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+                        <input type="checkbox" id="force-add-barn">
+                        <label for="force-add-barn" style="color:#fff; font-weight:bold;">إجبار الإضافة من بيانات الحظيرة</label>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- قسم إضافة الكمية -->
+                <div class="modal-section">
+                    <h3>➕ إضافة كمية جديدة</h3>
+                    <div class="form-group">
+                        <label for="new-male-count">عدد الذكور الجدد:</label>
+                        <input type="number" id="new-male-count" min="0" max="1000" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-female-count">عدد الإناث الجدد:</label>
+                        <input type="number" id="new-female-count" min="0" max="1000" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="mother-code">كود الأم (تلقائي):</label>
+                        <input type="text" id="mother-code" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-breed">الصنف (تلقائي):</label>
+                        <select id="modal-breed">
+                            <option value="أغنام">أغنام</option>
+                            <option value="أبقار">أبقار</option>
+                            <option value="ماعز">ماعز</option>
+                            <option value="جمال">جمال</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-type">النوع (تلقائي):</label>
+                        <select id="modal-type">
+                            <option value="حري">حري</option>
+                            <option value="نجدي">نجدي</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الجنس:</label>
+                        <div class="info-value" id="gender-info">سيتم تحديده تلقائياً بناء على العدد</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-purchase-date-input">تاريخ الشراء (تلقائي):</label>
+                        <input type="date" id="modal-purchase-date-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-price">القيمة الفردية (تلقائي):</label>
+                        <input type="number" id="modal-price" min="0" max="10000" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-location">الموقع (تلقائي):</label>
+                        <input type="text" id="modal-location" readonly>
+                    </div>
+                   
+                </div>
+            </div>
+
+            <!-- شريط التقدم -->
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">0%</div>
+            </div>
+
+            <!-- تأكيد داخلي داخل النافذة (مخفي افتراضياً) -->
+            <div id="modal-confirm-panel" style="display:none; margin-top:15px; background:rgba(255,255,255,0.06); padding:12px; border-radius:8px; border:1px solid rgba(255,255,255,0.08);">
+                <div id="modal-confirm-text" style="white-space:pre-wrap; color:white; font-weight:bold; margin-bottom:10px;"></div>
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button class="modal-btn save-btn" id="modal-confirm-yes">✅ تأكيد الإضافة</button>
+                    <button class="modal-btn cancel-btn" id="modal-confirm-no">❌ إلغاء</button>
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn save-btn" id="save-btn">💾 حفظ الكمية</button>
+                <button class="modal-btn generate-btn" onclick="generateNewCode()">🔄 توليد كود جديد</button>
+                <button class="modal-btn cancel-btn" onclick="closeAddQuantityModal()">❌ إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // البيانات والمتغيرات العامة
+        let currentBarnNumber = null;
+        let barnsData = [];
+        let sheepData = [];
+        let motherBaseFull = null;
+        let currentBarnDetails = null;
+        let isProcessing = false;
+
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDatabase();
+            loadBarns();
+            setupEventListeners();
+            
+            // تعيين التاريخ الحالي كافتراضي
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('modal-purchase-date-input').value = today;
+        });
+
+        // إعداد مستمعي الأحداث
+        function setupEventListeners() {
+            // تحديث معلومات الجنس عند تغيير العدد
+            document.getElementById('new-male-count').addEventListener('input', updateGenderInfo);
+            document.getElementById('new-female-count').addEventListener('input', updateGenderInfo);
+            
+            // تحديث الحقول التلقائية عند تغيير الحظيرة
+            document.getElementById('barn-select').addEventListener('change', onBarnSelected);
+            
+            // التحقق من السعة عند تغيير الكميات
+            document.getElementById('new-male-count').addEventListener('input', checkModalCapacity);
+            document.getElementById('new-female-count').addEventListener('input', checkModalCapacity);
+        }
+
+        // تهيئة قاعدة البيانات المحلية
+        function initializeDatabase() {
+            // إنشاء جداول إذا لم تكن موجودة
+            if (!localStorage.getItem('barnsData')) {
+                localStorage.setItem('barnsData', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('sheepData')) {
+                localStorage.setItem('sheepData', JSON.stringify([]));
+            }
+        }
+
+        // تحميل بيانات الحظائر
+        function loadBarns() {
+            barnsData = JSON.parse(localStorage.getItem('barnsData')) || [];
+
+            const barnSelect = document.getElementById('barn-select');
+            barnSelect.innerHTML = '<option value="">-- اختر حظيرة --</option>';
+
+            if (barnsData.length === 0) {
+                const noDataRow = document.createElement('option');
+                noDataRow.textContent = 'لا توجد حظائر - الرجاء إضافة حظيرة من القائمة الرئيسية';
+                noDataRow.disabled = true;
+                barnSelect.appendChild(noDataRow);
+                return;
+            }
+
+            barnsData.forEach(barn => {
+                const option = document.createElement('option');
+                option.value = barn.barnNumber || barn.number;
+                option.textContent = `${barn.barnName || barn.name} (رقم: ${barn.barnNumber || barn.number})`;
+                barnSelect.appendChild(option);
+            });
+        }
+
+        // عند اختيار حظيرة
+        function onBarnSelected() {
+            const barnNumber = document.getElementById('barn-select').value;
+            currentBarnNumber = barnNumber;
+
+            if (barnNumber) {
+                loadBarnDetails(barnNumber);
+                loadSheepTable(barnNumber);
+                enableButtons(true);
+            } else {
+                enableButtons(false);
+                document.getElementById('barn-info').classList.remove('visible');
+                document.getElementById('sheep-table-body').innerHTML = '';
+                updateSummary(0, 0, 0);
+            }
+        }
+
+        // تمكين أو تعطيل الأزرار
+        function enableButtons(enabled) {
+            document.getElementById('add-quantity-btn').disabled = !enabled;
+            document.getElementById('empty-barn-btn').disabled = !enabled;
+            document.getElementById('delete-barn-btn').disabled = !enabled;
+        }
+
+        // تحميل تفاصيل الحظيرة
+        function loadBarnDetails(barnNumber) {
+            const barn = barnsData.find(b => (b.barnNumber == barnNumber) || (b.number == barnNumber));
+
+            if (!barn) {
+                showMessage('لم يتم العثور على بيانات الحظيرة.', 'error');
+                document.getElementById('barn-info').classList.remove('visible');
+                return;
+            }
+
+            currentBarnDetails = barn;
+
+            // احسب الأعداد من سجلات الأغنام المفصّلة لضمان دقة العرض
+            sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            let existingMale = 0;
+            let existingFemale = 0;
+            sheepData.forEach(s => {
+                if (String(s.barnNumber) === String(currentBarnNumber)) {
+                    const rep = parseInt(s.repeat) || 1;
+                    if (s.gender === 'ذكر') existingMale += rep;
+                    else if (s.gender === 'أنثى') existingFemale += rep;
+                }
+            });
+
+            const maleCount = barn.maleCount || barn.maleQty || 0;
+            const femaleCount = barn.femaleCount || barn.femaleQty || 0;
+            const usedCount = existingMale + existingFemale; // السعة المستخدمة الحقيقية من السجلات
+            const totalCapacity = parseInt(barn.totalCapacity || barn.capacity) || 0;
+            const remainingCapacity = Math.max(0, totalCapacity - usedCount);
+
+            document.getElementById('barn-info').classList.add('visible');
+
+            // تعبئة البيانات
+            document.getElementById('barn-number').textContent = barn.barnNumber || barn.number;
+            document.getElementById('barn-name').textContent = barn.barnName || barn.name;
+            document.getElementById('total-capacity').textContent = `${totalCapacity} رأس`;
+            document.getElementById('used-capacity').textContent = `${usedCount} رأس`;
+            document.getElementById('remaining-capacity').textContent = `${remainingCapacity} رأس`;
+            document.getElementById('barn-location').textContent = barn.location || barn.barnLocation || 'غير محدد';
+            document.getElementById('barn-breed').textContent = barn.breed || barn.animalType || 'غير محدد';
+            document.getElementById('barn-type').textContent = barn.type || barn.gender || 'غير محدد';
+            document.getElementById('purchase-date').textContent = barn.purchaseDate || barn.gregorianDate || 'غير محدد';
+            document.getElementById('male-count').textContent = maleCount;
+            document.getElementById('female-count').textContent = femaleCount;
+            document.getElementById('unit-price').textContent = formatPrice(barn.unitPrice || 0);
+
+            // تحديث حالة الأزرار بناءً على السعة
+            updateButtonsState(usedCount, totalCapacity);
+        }
+
+        // تحديث حالة الأزرار بناءً على السعة
+        function updateButtonsState(usedCapacity, totalCapacity) {
+            const isFull = usedCapacity >= totalCapacity;
+            const hasSheep = usedCapacity > 0;
+            
+            document.getElementById('add-quantity-btn').disabled = isFull;
+            document.getElementById('empty-barn-btn').disabled = !hasSheep;
+            
+            // تغيير لون الزر إذا كانت الحظيرة ممتلئة
+            const addBtn = document.getElementById('add-quantity-btn');
+            if (isFull) {
+                addBtn.style.background = 'linear-gradient(to bottom, #bdc3c7, #95a5a6)';
+            } else {
+                addBtn.style.background = 'linear-gradient(to bottom, #1e3c72, #2a5298)';
+            }
+        }
+
+        // تحميل جدول الأغنام
+        function loadSheepTable(barnNumber) {
+            // جلب بيانات الأغنام من قاعدة البيانات
+            sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            const barnSheep = sheepData.filter(sheep => String(sheep.barnNumber) == String(barnNumber));
+            
+            const tableBody = document.getElementById('sheep-table-body');
+            tableBody.innerHTML = '';
+            
+            let maleTotal = 0;
+            let femaleTotal = 0;
+
+            if (barnSheep.length === 0) {
+                // عرض رسالة عدم وجود أغنام
+                const noDataRow = document.createElement('tr');
+                noDataRow.innerHTML = `
+                    <td colspan="9" class="no-data">لا توجد أغنام في هذه الحظيرة</td>
+                `;
+                tableBody.appendChild(noDataRow);
+            } else {
+                // نعرض كل رأس على حدة: إذا كان الحقل `repeat` > 1، نخلق صفًا لكل رأس
+                barnSheep.forEach((sheep) => {
+                    const rep = parseInt(sheep.repeat) || 1;
+
+                    // احسب المجاميع حسب التكرار
+                    if (sheep.gender === 'ذكر') {
+                        maleTotal += rep;
+                    } else if (sheep.gender === 'أنثى') {
+                        femaleTotal += rep;
+                    }
+
+                    // نحول كل سجل إلى rep صفوف مفردة
+                    for (let i = 0; i < rep; i++) {
+                        const row = document.createElement('tr');
+
+                        // تنسيق كود الحظيرة
+                        const barnCode = sheep.barnNumber.toString().padStart(3, '0');
+
+                        // تنسيق كود الأم (نُظهر اللاحقة M/F مع الرقم إذا وُجد)
+                        let motherDisplay = sheep.motherCode || '';
+                        try {
+                            const match = String(sheep.motherCode).match(/-([MF])(\d+)$/i);
+                            if (match) {
+                                motherDisplay = `${match[1].toUpperCase()}${match[2].padStart(3, '0')}`;
+                            }
+                        } catch (e) {
+                            // نترك القيمة كما هي عند الخطأ
+                        }
+
+                        row.innerHTML = `
+                            <td>${motherDisplay}</td>
+                            <td>${barnCode}</td>
+                            <td>${sheep.type || ''}</td>
+                            <td>${sheep.breed || ''}</td>
+                            <td>${sheep.gender || ''}</td>
+                            <td>${sheep.purchaseDate || ''}</td>
+                            <td>${formatPrice(sheep.unitPrice || 0)}</td>
+                            <td>${sheep.location || ''}</td>
+                            <td>1</td>
+                        `;
+
+                        tableBody.appendChild(row);
+                    }
+                });
+            }
+            
+            // تحديث الملخص
+            updateSummary(maleTotal, femaleTotal, maleTotal + femaleTotal);
+        }
+
+        // تحديث ملخص الأعداد
+        function updateSummary(males, females, total) {
+            document.getElementById('total-sheep').textContent = `إجمالي الأغنام: ${total}`;
+            document.getElementById('total-males').textContent = `الذكور: ${males}`;
+            document.getElementById('total-females').textContent = `الإناث: ${females}`;
+        }
+
+        // تنسيق السعر
+        function formatPrice(value, suffix = true) {
+            try {
+                if (value === null || value === undefined) {
+                    return suffix ? '0 ريال' : '0';
+                }
+                
+                const num = parseFloat(value);
+                if (isNaN(num)) return suffix ? '0 ريال' : '0';
+                
+                let s = num.toFixed(2);
+                s = s.replace(/\.?0+$/, '');
+                
+                return suffix ? `${s} ريال` : s;
+            } catch (e) {
+                return suffix ? '0 ريال' : '0';
+            }
+        }
+
+        // فتح نافذة إدخال الكمية
+        function openAddQuantityModal() {
+            if (!currentBarnNumber) {
+                showMessage('يرجى اختيار حظيرة أولاً', 'error');
+                return;
+            }
+            
+            const barn = barnsData.find(b => (b.barnNumber == currentBarnNumber) || (b.number == currentBarnNumber));
+            if (!barn) {
+                showMessage('لم يتم العثور على بيانات الحظيرة', 'error');
+                return;
+            }
+            
+            // تعبئة بيانات النافذة
+            document.getElementById('modal-title').textContent = `إدخال كمية الأغنام - الحظيرة ${currentBarnNumber}`;
+            document.getElementById('modal-barn-name').textContent = barn.barnName || barn.name;
+            document.getElementById('modal-barn-location').textContent = barn.location || barn.barnLocation || 'غير محدد';
+            document.getElementById('modal-barn-breed').textContent = barn.breed || barn.animalType || 'غير محدد';
+            document.getElementById('modal-barn-type').textContent = barn.type || barn.gender || 'غير محدد';
+            
+            // استخدام البيانات من جدول الحظائر مباشرة
+            const maleCount = barn.maleCount || barn.maleQty || 0;
+            const femaleCount = barn.femaleCount || barn.femaleQty || 0;
+            const usedCount = maleCount + femaleCount;
+            const totalCapacity = parseInt(barn.totalCapacity || barn.capacity) || 0;
+            const remainingCapacity = Math.max(0, totalCapacity - usedCount);
+            
+            document.getElementById('modal-male-count').textContent = `${maleCount} رأس`;
+            document.getElementById('modal-female-count').textContent = `${femaleCount} رأس`;
+            document.getElementById('modal-unit-price').textContent = formatPrice(barn.unitPrice || 0);
+            document.getElementById('modal-purchase-date').textContent = barn.purchaseDate || barn.gregorianDate || 'غير محدد';
+            // عرض السعة المستخدمة الحقيقية والمساحة المتبقية بناءً على السجلات المفصّلة
+            document.getElementById('modal-used-capacity').textContent = `${usedCount} رأس`;
+            document.getElementById('modal-remaining-capacity').textContent = `${remainingCapacity} رأس`;
+            
+            // تعبئة الحقول التلقائية
+            document.getElementById('modal-breed').value = barn.breed || barn.animalType || 'أغنام';
+            document.getElementById('modal-type').value = barn.type || barn.gender || 'حري';
+            document.getElementById('modal-price').value = barn.unitPrice || 0;
+            document.getElementById('modal-location').value = barn.location || barn.barnLocation || '';
+            
+            if (barn.purchaseDate || barn.gregorianDate) {
+                document.getElementById('modal-purchase-date-input').value = barn.purchaseDate || barn.gregorianDate;
+            }
+            
+            // تعبئة عدد الذكور والإناث تلقائياً
+            document.getElementById('new-male-count').value = 0;
+            document.getElementById('new-female-count').value = 0;
+            
+            // توليد كود أم تلقائي
+            generateNewCode();
+            
+            // تحديث معلومات الجنس
+            updateGenderInfo();
+            
+            // إعادة تعيين شريط التقدم
+            document.getElementById('progress-container').style.display = 'none';
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-text').textContent = '0%';
+            
+            // إخفاء التنبيه
+            document.getElementById('modal-alert').style.display = 'none';
+            
+            // عرض النافذة
+            document.getElementById('quantity-modal').style.display = 'block';
+
+            // ربط زر الحفظ داخل النافذة ليظهر التأكيد الداخلي بدلاً من confirm()
+            const saveBtn = document.getElementById('save-btn');
+            if (saveBtn) {
+                saveBtn.onclick = saveQuantity;
+            }
+        }
+
+        // إغلاق نافذة إدخال الكمية
+        function closeAddQuantityModal() {
+            if (isProcessing) {
+                if (!confirm('العملية قيد التنفيذ، هل تريد الإلغاء؟')) {
+                    return;
+                }
+                isProcessing = false;
+            }
+            document.getElementById('quantity-modal').style.display = 'none';
+        }
+
+        // تحديث معلومات الجنس
+        function updateGenderInfo() {
+            const maleCount = parseInt(document.getElementById('new-male-count').value) || 0;
+            const femaleCount = parseInt(document.getElementById('new-female-count').value) || 0;
+            
+            if (maleCount > 0 && femaleCount > 0) {
+                document.getElementById('gender-info').textContent = `سيتم إضافة ${maleCount} ذكر و ${femaleCount} أنثى`;
+            } else if (maleCount > 0) {
+                document.getElementById('gender-info').textContent = `سيتم إضافة ${maleCount} ذكر فقط`;
+            } else if (femaleCount > 0) {
+                document.getElementById('gender-info').textContent = `سيتم إضافة ${femaleCount} أنثى فقط`;
+            } else {
+                document.getElementById('gender-info').textContent = 'يرجى إدخال العدد';
+            }
+            
+            // التحقق من السعة بعد التحديث
+            checkModalCapacity();
+        }
+
+        // التحقق من السعة في النافذة
+        function checkModalCapacity() {
+            const maleCount = parseInt(document.getElementById('new-male-count').value) || 0;
+            const femaleCount = parseInt(document.getElementById('new-female-count').value) || 0;
+            const totalNew = maleCount + femaleCount;
+            
+            const barn = barnsData.find(b => (b.barnNumber == currentBarnNumber) || (b.number == currentBarnNumber));
+            if (!barn) return;
+            // احسب السجلات المفصلة الحالية للحظيرة
+            sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            let existingMale = 0;
+            let existingFemale = 0;
+            sheepData.forEach(s => {
+                if (String(s.barnNumber) === String(currentBarnNumber)) {
+                    const rep = parseInt(s.repeat) || 1;
+                    if (s.gender === 'ذكر') existingMale += rep;
+                    else if (s.gender === 'أنثى') existingFemale += rep;
+                }
+            });
+
+            const currentUsed = existingMale + existingFemale;
+            const afterTotal = currentUsed + totalNew;
+            const totalCapacity = parseInt(barn.totalCapacity || barn.capacity) || 0;
+
+            // حدث قيم السعة في النافذة لتظهر للمستخدم التغيير الفعلي
+            document.getElementById('modal-used-capacity').textContent = `${currentUsed + totalNew} رأس`;
+            document.getElementById('modal-remaining-capacity').textContent = `${Math.max(0, totalCapacity - (currentUsed + totalNew))} رأس`;
+
+            const alertElement = document.getElementById('modal-alert');
+
+            if (afterTotal > totalCapacity) {
+                alertElement.textContent = `⚠️ تنبيه: العدد ${totalNew} يتجاوز السعة المتاحة ${totalCapacity - currentUsed}`;
+                alertElement.style.display = 'block';
+                document.getElementById('save-btn').disabled = true;
+            } else {
+                alertElement.style.display = 'none';
+                document.getElementById('save-btn').disabled = false;
+            }
+        }
+
+        // عرض تأكيد داخلي داخل النافذة (بديل confirm)
+        function showModalConfirm(text, onConfirm) {
+            const panel = document.getElementById('modal-confirm-panel');
+            const textEl = document.getElementById('modal-confirm-text');
+            const yesBtn = document.getElementById('modal-confirm-yes');
+            const noBtn = document.getElementById('modal-confirm-no');
+            if (!panel || !textEl || !yesBtn || !noBtn) {
+                // fallback to browser confirm
+                if (confirm(text)) onConfirm();
+                return;
+            }
+
+            textEl.textContent = text;
+            panel.style.display = 'block';
+
+            // handlers
+            const cleanup = () => {
+                panel.style.display = 'none';
+                yesBtn.onclick = null;
+                noBtn.onclick = null;
+            };
+
+            noBtn.onclick = () => {
+                cleanup();
+            };
+
+            yesBtn.onclick = () => {
+                cleanup();
+                onConfirm();
+            };
+        }
+
+        // توليد كود أم جديد
+        function generateNewCode() {
+            if (!currentBarnNumber) return;
+            
+            // توليد كود أم (رقم تسلسلي)
+            const barnCode = currentBarnNumber.toString().padStart(3, '0');
+            
+            // البحث عن آخر كود أم في هذه الحظيرة
+            const barnSheep = sheepData.filter(sheep => String(sheep.barnNumber) == String(currentBarnNumber));
+            let maxSeq = 0;
+            
+            barnSheep.forEach(sheep => {
+                try {
+                    const match = sheep.motherCode.match(/-(\d+)-/);
+                    if (match) {
+                        const seq = parseInt(match[1]);
+                        if (seq > maxSeq) maxSeq = seq;
+                    }
+                } catch (e) {
+                    // تجاهل الأخطاء
+                }
+            });
+            
+            const nextSeq = (maxSeq + 1).toString().padStart(4, '0');
+            motherBaseFull = `${barnCode}-${nextSeq}`;
+            
+            // عرض الجزء الرقمي فقط
+            document.getElementById('mother-code').value = nextSeq;
+        }
+
+        // حفظ الكمية
+        function saveQuantity() {
+            if (isProcessing) return;
+
+            if (!currentBarnNumber) {
+                showMessage('يرجى اختيار حظيرة أولاً', 'error');
+                return;
+            }
+
+            // قيم المستخدم من النافذة (قد تكون صفر)
+            const modalMale = parseInt(document.getElementById('new-male-count').value) || 0;
+            const modalFemale = parseInt(document.getElementById('new-female-count').value) || 0;
+
+            const barn = barnsData.find(b => (b.barnNumber == currentBarnNumber) || (b.number == currentBarnNumber));
+            if (!barn) {
+                showMessage('لم يتم العثور على بيانات الحظيرة', 'error');
+                return;
+            }
+
+            // بيانات الأغنام المفصلة الحالية لهذه الحظيرة
+            sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            let existingMale = 0;
+            let existingFemale = 0;
+            sheepData.forEach(s => {
+                if (String(s.barnNumber) === String(currentBarnNumber)) {
+                    const rep = parseInt(s.repeat) || 1;
+                    if (s.gender === 'ذكر') existingMale += rep;
+                    else if (s.gender === 'أنثى') existingFemale += rep;
+                }
+            });
+
+            // إذا تم اختيار "إجبار الإضافة من بيانات الحظيرة" نضيف كامل أعداد الحظيرة
+            const forceAdd = document.getElementById('force-add-barn')?.checked;
+            let maleToAdd = modalMale;
+            let femaleToAdd = modalFemale;
+            const barnMale = barn.maleCount || barn.maleQty || 0;
+            const barnFemale = barn.femaleCount || barn.femaleQty || 0;
+            if (forceAdd) {
+                maleToAdd = barnMale;
+                femaleToAdd = barnFemale;
+            } else if (modalMale === 0 && modalFemale === 0) {
+                // نضيف فقط الفرق بين عدد الحظيرة والسجلات المفصلة الحالية
+                maleToAdd = Math.max(0, barnMale - existingMale);
+                femaleToAdd = Math.max(0, barnFemale - existingFemale);
+            }
+
+            const totalNew = maleToAdd + femaleToAdd;
+            if (totalNew === 0) {
+                showMessage('لا توجد أغنام جديدة لإضافتها حسب المدخلات وبيانات الحظيرة.', 'error');
+                return;
+            }
+
+            // التحقق من السعة بالنسبة للسجلات المفصلة الحالية
+            const existingUsed = existingMale + existingFemale;
+            const totalCapacity = parseInt(barn.totalCapacity || barn.capacity) || 0;
+            if (existingUsed + totalNew > totalCapacity) {
+                showMessage(`لا يمكن الإضافة: العدد ${totalNew} يتجاوز السعة المتاحة ${totalCapacity - existingUsed}`, 'error');
+                return;
+            }
+
+            // تأكيد الإضافة داخل النافذة — نعرض ملخص وننتظر تأكيد المستخدم داخل النافذة
+            const modeNote = (modalMale === 0 && modalFemale === 0) ? ' (توليد بناءً على بيانات الحظيرة)' : '';
+            const existingUsedNow = existingMale + existingFemale;
+            const afterTotalNow = existingUsedNow + totalNew;
+            const remainingAfter = Math.max(0, totalCapacity - afterTotalNow);
+
+            let confirmMsg = 'تفاصيل الإضافة:\n\n';
+            confirmMsg += `الأغنام الموجودة حالياً: ${existingUsedNow} (ذكور: ${existingMale}, إناث: ${existingFemale})\n`;
+            confirmMsg += `سيتم إضافة: ${totalNew} (ذكور: ${maleToAdd}, إناث: ${femaleToAdd})\n`;
+            confirmMsg += `الإجمالي بعد الإضافة: ${afterTotalNow}\n`;
+            confirmMsg += `السعة الكلية: ${totalCapacity}\n`;
+            confirmMsg += `المتبقي بعد الإضافة: ${remainingAfter}\n\n`;
+            confirmMsg += `اضغط تأكيد لإتمام العملية${modeNote}`;
+
+            // عرض التأكيد الداخلي؛ عند الموافقة نبدأ المعالجة
+            showModalConfirm(confirmMsg, () => {
+                // بدء المعالجة
+                isProcessing = true;
+                document.getElementById('progress-container').style.display = 'block';
+                document.getElementById('save-btn').disabled = true;
+
+                // محاكاة المعالجة التدريجية
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    if (progress > 100) progress = 100;
+
+                    document.getElementById('progress-fill').style.width = `${progress}%`;
+                    document.getElementById('progress-text').textContent = `${progress}%`;
+
+                    if (progress === 100) {
+                        clearInterval(progressInterval);
+                        completeSaveProcess(maleToAdd, femaleToAdd);
+                    }
+                }, 100);
+            });
+            return;
+
+            // بدء المعالجة
+            isProcessing = true;
+            document.getElementById('progress-container').style.display = 'block';
+            document.getElementById('save-btn').disabled = true;
+
+            // محاكاة المعالجة التدريجية
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 5;
+                if (progress > 100) progress = 100;
+
+                document.getElementById('progress-fill').style.width = `${progress}%`;
+                document.getElementById('progress-text').textContent = `${progress}%`;
+
+                if (progress === 100) {
+                    clearInterval(progressInterval);
+                    completeSaveProcess(maleToAdd, femaleToAdd);
+                }
+            }, 100);
+        }
+
+        // إكمال عملية الحفظ
+        function completeSaveProcess(maleCount, femaleCount) {
+            try {
+                // تحديث بيانات الأغنام الحالية ثم توليد كود أم جديد لضمان تسلسل صحيح
+                sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+                generateNewCode();
+
+                const purchaseDate = document.getElementById('modal-purchase-date-input').value;
+                const breed = document.getElementById('modal-breed').value;
+                const type = document.getElementById('modal-type').value;
+                const price = parseFloat(document.getElementById('modal-price').value) || 0;
+                const location = document.getElementById('modal-location').value;
+                
+                // حفظ البيانات في جدول الأغنام فقط
+                const newSheepData = [];
+                
+                // إضافة الذكور
+                for (let i = 0; i < maleCount; i++) {
+                    newSheepData.push({
+                        barnNumber: currentBarnNumber,
+                        motherCode: `${motherBaseFull}-M${(i+1).toString().padStart(3, '0')}`,
+                        type: type,
+                        breed: breed,
+                        gender: 'ذكر',
+                        purchaseDate: purchaseDate,
+                        unitPrice: price,
+                        location: location,
+                        repeat: 1
+                    });
+                }
+                
+                // إضافة الإناث
+                for (let i = 0; i < femaleCount; i++) {
+                    newSheepData.push({
+                        barnNumber: currentBarnNumber,
+                        motherCode: `${motherBaseFull}-F${(i+1).toString().padStart(3, '0')}`,
+                        type: type,
+                        breed: breed,
+                        gender: 'أنثى',
+                        purchaseDate: purchaseDate,
+                        unitPrice: price,
+                        location: location,
+                        repeat: 1
+                    });
+                }
+                
+                // حفظ البيانات في قاعدة البيانات
+                const existingSheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+                // قبل الدمج: تحديث motherBaseFull ليكون تتابعيًا إذا أضفنا مجموعات متعددة متعاقبة
+                // (نستخدم motherBaseFull كأساس، وأرقام M/F تتزايد داخل كل مجموعة)
+                const updatedSheepData = [...existingSheepData, ...newSheepData];
+                localStorage.setItem('sheepData', JSON.stringify(updatedSheepData));
+                
+                // لا نقوم بتحديث بيانات الحظيرة (لا نحدث maleCount و femaleCount)
+                
+                // إغلاق النافذة وتحديث البيانات
+                isProcessing = false;
+                document.getElementById('save-btn').disabled = false;
+                closeAddQuantityModal();
+                loadBarnDetails(currentBarnNumber); // إعادة تحميل بيانات الحظيرة (لن تتغير)
+                loadSheepTable(currentBarnNumber); // تحديث جدول الأغنام والملخص
+                
+                showMessage(`تم إضافة ${newSheepData.length} غنم بنجاح!\nالذكور: ${maleCount}\nالإناث: ${femaleCount}\nكود الأم: ${motherBaseFull}`, 'success');
+            } catch (error) {
+                showMessage(`حدث خطأ أثناء الحفظ: ${error.message}`, 'error');
+                isProcessing = false;
+                document.getElementById('save-btn').disabled = false;
+            }
+        }
+
+        // إفراغ الحظيرة
+        function emptyCurrentBarn() {
+            if (!currentBarnNumber) return;
+            
+            if (!confirm(`هل أنت متأكد من إفراغ الحظيرة ${currentBarnNumber}؟\nسيتم حذف جميع الأغنام في هذه الحظيرة!`)) {
+                return;
+            }
+            
+            // إفراغ الحظيرة من الأغنام فقط
+            const existingSheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            const updatedSheepData = existingSheepData.filter(sheep => String(sheep.barnNumber) != String(currentBarnNumber));
+            localStorage.setItem('sheepData', JSON.stringify(updatedSheepData));
+
+            // لا نقوم بتعديل بيانات الحظيرة (لا نعيد تعيين maleCount و femaleCount)
+
+            // تحديث العرض
+            loadBarnDetails(currentBarnNumber);
+            loadSheepTable(currentBarnNumber);
+
+            showMessage('تم إفراغ الحظيرة بنجاح (تم حذف بيانات الأغنام)', 'success');
+        }
+
+        // حذف الحظيرة
+        function deleteCurrentBarn() {
+            if (!currentBarnNumber) return;
+            
+            if (!confirm(`هل أنت متأكد من حذف الحظيرة ${currentBarnNumber}؟\nسيتم حذف الحظيرة وجميع الأغنام فيها!`)) {
+                return;
+            }
+            
+            // حذف الحظيرة
+            const updatedBarnsData = barnsData.filter(b => (b.barnNumber != currentBarnNumber) && (b.number != currentBarnNumber));
+            localStorage.setItem('barnsData', JSON.stringify(updatedBarnsData));
+            
+            // حذف الأغنام المرتبطة بالحظيرة
+            const existingSheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            const updatedSheepData = existingSheepData.filter(sheep => String(sheep.barnNumber) != String(currentBarnNumber));
+            localStorage.setItem('sheepData', JSON.stringify(updatedSheepData));
+            
+            // تحديث العرض
+            loadBarns();
+            document.getElementById('barn-info').classList.remove('visible');
+            document.getElementById('sheep-table-body').innerHTML = '';
+            updateSummary(0, 0, 0);
+            enableButtons(false);
+            currentBarnNumber = null;
+            
+            showMessage('تم حذف الحظيرة بنجاح', 'success');
+        }
+
+        // عرض رسالة
+        function showMessage(message, type) {
+            const successElement = document.getElementById('success-message');
+            const errorElement = document.getElementById('error-message');
+            
+            if (type === 'success') {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                errorElement.style.display = 'none';
+            } else if (type === 'error') {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                successElement.style.display = 'none';
+            }
+            
+            // إخفاء الرسالة بعد 3 ثوانٍ
+            setTimeout(() => {
+                successElement.style.display = 'none';
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // الرجوع للقائمة الرئيسية
+        function goBack() {
+            if (!confirm('هل تريد الرجوع للقائمة الرئيسية؟')) return;
+            window.location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>

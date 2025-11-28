@@ -1,504 +1,535 @@
-// بيانات التطبيق
-class BarnApp {
-    constructor() {
-        this.selectedId = null;
-        this.barns = JSON.parse(localStorage.getItem('barns')) || [];
-        
-        // أنواع الحيوانات لكل صنف
-        this.animalTypesMapping = {
-            "أغنام": ["حري", "نعيمي", "نجدي", "شامي"],
-            "أبقار": ["بلدي", "هولشتاين", "ساحلي"], 
-            "ماعز": ["شامي", "سعادي", "حيسي"],
-            "جمال": ["مجاهيم", "شعل", "وضح"]
-        };
-        
-        // بيانات الحظائر
-        this.barnData = {
-            "1": {"name": "الحظيرة الأولى", "location": "شمال المزرعة", "capacity": 200},
-            "2": {"name": "الحظيرة الثانية", "location": "جنوب المزرعة", "capacity": 300},
-            "3": {"name": "الحظيرة الثالثة", "location": "شرق المزرعة", "capacity": 200},
-            "4": {"name": "الحظيرة الرابعة", "location": "غرب المزرعة", "capacity": 300},
-            "5": {"name": "الحظيرة الخامسة", "location": "وسط المزرعة", "capacity": 200},
-            "6": {"name": "الحظيرة السادسة", "location": "شمال المزرعة", "capacity": 300},
-            "7": {"name": "الحظيرة السابعة", "location": "جنوب المزرعة", "capacity": 200},
-            "8": {"name": "الحظيرة الثامنة", "location": "شرق المزرعة", "capacity": 300},
-            "9": {"name": "الحظيرة التاسعة", "location": "غرب المزرعة", "capacity": 200},
-            "10": {"name": "الحظيرة العاشرة", "location": "وسط المزرعة", "capacity": 300},
-            "11": {"name": "الحظيرة الحادية عشر", "location": "شمال المزرعة", "capacity": 200},
-            "12": {"name": "الحظيرة الثانية عشر", "location": "جنوب المزرعة", "capacity": 300},
-            "13": {"name": "الحظيرة الثالثة عشر", "location": "شرق المزرعة", "capacity": 200},
-            "14": {"name": "الحظيرة الرابعة عشر", "location": "غرب المزرعة", "capacity": 300},
-            "15": {"name": "الحظيرة الخامسة عشر", "location": "وسط المزرعة", "capacity": 200},
-            "16": {"name": "الحظيرة السادسة عشر", "location": "شمال المزرعة", "capacity": 300},
-            "17": {"name": "الحظيرة السابعة عشر", "location": "جنوب المزرعة", "capacity": 200},
-            "18": {"name": "الحظيرة الثامنة عشر", "location": "شرق المزرعة", "capacity": 300},
-            "19": {"name": "الحظيرة التاسعة عشر", "location": "غرب المزرعة", "capacity": 200},
-            "20": {"name": "الحظيرة العشرون", "location": "وسط المزرعة", "capacity": 300}
-        };
-        
-        this.init();
+// تهيئة التطبيق عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    initializeApp();
+});
+
+function initializeApp() {
+    // تعيين التاريخ الميلادي الحالي
+    const today = new Date();
+    document.getElementById('gregorian-date').valueAsDate = today;
+    
+    // تحديث التاريخ الهجري واسم اليوم
+    updateHijriDate();
+    updateDayName();
+    
+    // تحميل القوائم المرجعية
+    loadLookups();
+    
+    // تعيين رقم الحظيرة التلقائي
+    setAutoBarnNumber();
+    
+    // تحميل البيانات
+    loadData();
+    
+    // إضافة المستمعين للأحداث
+    setupEventListeners();
+}
+
+function setupEventListeners() {
+    // تحديث الإجماليات تلقائياً
+    document.getElementById('male-qty').addEventListener('input', updateTotals);
+    document.getElementById('female-qty').addEventListener('input', updateTotals);
+    document.getElementById('unit-price').addEventListener('input', updateTotals);
+    
+    // تحديث التاريخ الهجري واسم اليوم عند تغيير التاريخ الميلادي
+    document.getElementById('gregorian-date').addEventListener('change', function() {
+        updateHijriDate();
+        updateDayName();
+    });
+    
+    // تحديث أنواع الحيوانات عند تغيير الصنف
+    document.getElementById('animal-type').addEventListener('change', updateAnimalTypes);
+    
+    // التحقق من السعة
+    document.getElementById('male-qty').addEventListener('input', checkCapacity);
+    document.getElementById('female-qty').addEventListener('input', checkCapacity);
+    document.getElementById('capacity').addEventListener('input', checkCapacity);
+    
+    // تحديث بيانات الحظيرة عند تغيير الرقم
+    document.getElementById('barn-number').addEventListener('change', updateBarnData);
+    
+    // إضافة عناصر جديدة للقوائم المرجعية
+    document.getElementById('animal-type').addEventListener('blur', addNewSpecies);
+    document.getElementById('gender').addEventListener('blur', addNewType);
+    document.getElementById('location').addEventListener('blur', addNewLocation);
+    document.getElementById('supervisor').addEventListener('blur', addNewSupervisor);
+}
+
+function loadLookups() {
+    // تحميل أرقام الحظائر
+    const barnNumberSelect = document.getElementById('barn-number');
+    barnNumberSelect.innerHTML = '<option value="">-- اختر رقم الحظيرة --</option>';
+    
+    for (let i = 1; i <= 20; i++) {
+        const option = document.createElement('option');
+        option.value = i.toString();
+        option.textContent = i.toString();
+        barnNumberSelect.appendChild(option);
     }
     
-    init() {
-        this.setupEventListeners();
-        this.populateBarnNumbers();
-        this.updateAnimalTypes();
-        this.setAutoBarnNumber();
-        this.updateHijriDate();
-        this.updateDayName();
-        this.updateStatistics();
-        this.loadData();
-    }
+    // تحميل الأصناف
+    const animalTypeSelect = document.getElementById('animal-type');
+    animalTypeSelect.innerHTML = '<option value="">-- اختر الصنف --</option>';
+    appData.species.forEach(species => {
+        const option = document.createElement('option');
+        option.value = species;
+        option.textContent = species;
+        animalTypeSelect.appendChild(option);
+    });
     
-    setupEventListeners() {
-        // أزرار العمليات
-        document.getElementById('btnNew').addEventListener('click', () => this.clearFields());
-        document.getElementById('btnSave').addEventListener('click', () => this.saveBarn());
-        document.getElementById('btnView').addEventListener('click', () => this.loadData());
-        document.getElementById('btnDelete').addEventListener('click', () => this.deleteBarn());
-        document.getElementById('searchBtn').addEventListener('click', () => this.searchBarns());
-        
-        // التحديثات التلقائية
-        document.getElementById('animalType').addEventListener('change', () => this.updateAnimalTypes());
-        document.getElementById('maleQty').addEventListener('input', () => this.updateTotals());
-        document.getElementById('femaleQty').addEventListener('input', () => this.updateTotals());
-        document.getElementById('unitPrice').addEventListener('input', () => this.updateTotals());
-        document.getElementById('gregorianDate').addEventListener('change', () => {
-            this.updateHijriDate();
-            this.updateDayName();
-        });
-        document.getElementById('maleQty').addEventListener('input', () => this.checkCapacity());
-        document.getElementById('femaleQty').addEventListener('input', () => this.checkCapacity());
-        document.getElementById('capacity').addEventListener('input', () => this.checkCapacity());
-        document.getElementById('barnNumber').addEventListener('change', () => this.updateBarnData());
-        
-        // زر الرجوع
-        document.getElementById('backBtn').addEventListener('click', () => {
-            if (confirm('هل تريد الرجوع إلى القائمة الرئيسية؟')) {
-                window.close();
-            }
-        });
-        
-        // البحث عند الضغط على Enter
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.searchBarns();
-            }
-        });
-    }
+    // تحميل المواقع
+    const locationSelect = document.getElementById('location');
+    locationSelect.innerHTML = '<option value="">-- اختر الموقع --</option>';
+    appData.locations.forEach(location => {
+        const option = document.createElement('option');
+        option.value = location;
+        option.textContent = location;
+        locationSelect.appendChild(option);
+    });
     
-    populateBarnNumbers() {
-        const barnNumberSelect = document.getElementById('barnNumber');
-        barnNumberSelect.innerHTML = '';
-        
-        for (let i = 1; i <= 20; i++) {
+    // تحميل المشرفين
+    const supervisorSelect = document.getElementById('supervisor');
+    supervisorSelect.innerHTML = '<option value="">-- اختر المشرف --</option>';
+    appData.supervisors.forEach(supervisor => {
+        const option = document.createElement('option');
+        option.value = supervisor;
+        option.textContent = supervisor;
+        supervisorSelect.appendChild(option);
+    });
+    
+    // تحديث أنواع الحيوانات بناءً على الصنف المحدد
+    updateAnimalTypes();
+}
+
+function updateAnimalTypes() {
+    const selectedAnimal = document.getElementById('animal-type').value;
+    const genderSelect = document.getElementById('gender');
+    
+    genderSelect.innerHTML = '<option value="">-- اختر النوع --</option>';
+    
+    if (selectedAnimal && appData.types[selectedAnimal]) {
+        appData.types[selectedAnimal].forEach(type => {
             const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            barnNumberSelect.appendChild(option);
-        }
+            option.value = type;
+            option.textContent = type;
+            genderSelect.appendChild(option);
+        });
     }
+}
+
+function updateBarnData() {
+    const selectedNumber = document.getElementById('barn-number').value;
     
-    updateAnimalTypes() {
-        const selectedAnimal = document.getElementById('animalType').value;
-        const genderSelect = document.getElementById('gender');
+    if (selectedNumber && appData.barnData[selectedNumber]) {
+        document.getElementById('barn-name').value = appData.barnData[selectedNumber].name;
+        document.getElementById('capacity').value = appData.barnData[selectedNumber].capacity;
         
-        genderSelect.innerHTML = '';
-        
-        if (this.animalTypesMapping[selectedAnimal]) {
-            this.animalTypesMapping[selectedAnimal].forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                genderSelect.appendChild(option);
-            });
-        }
-    }
-    
-    updateBarnData() {
-        const selectedNumber = document.getElementById('barnNumber').value;
-        
-        if (this.barnData[selectedNumber]) {
-            document.getElementById('barnName').value = this.barnData[selectedNumber].name;
-            document.getElementById('capacity').value = this.barnData[selectedNumber].capacity;
-            
-            const locationSelect = document.getElementById('location');
-            for (let i = 0; i < locationSelect.options.length; i++) {
-                if (locationSelect.options[i].value === this.barnData[selectedNumber].location) {
-                    locationSelect.selectedIndex = i;
-                    break;
-                }
-            }
-        } else {
-            try {
-                const barnNum = parseInt(selectedNumber);
-                const capacityValue = barnNum % 2 === 1 ? 200 : 300;
-                document.getElementById('capacity').value = capacityValue;
-                document.getElementById('barnName').value = `الحظيرة ${selectedNumber}`;
-                
-                const locationSelect = document.getElementById('location');
-                locationSelect.selectedIndex = barnNum % 5;
-            } catch (error) {
-                document.getElementById('capacity').value = 200;
-            }
-        }
-    }
-    
-    updateTotals() {
-        const maleQty = parseInt(document.getElementById('maleQty').value) || 0;
-        const femaleQty = parseInt(document.getElementById('femaleQty').value) || 0;
-        const totalQty = maleQty + femaleQty;
-        
-        document.getElementById('totalQuantity').value = totalQty;
-        
-        // الحصول على قيمة السعر الفردي كرقم مباشرة
-        const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
-        const totalPrice = unitPrice * totalQty;
-        
-        document.getElementById('totalPrice').value = totalPrice.toLocaleString('ar-EG') + ' ريال';
-    }
-    
-    updateHijriDate() {
-        const gregorianDate = new Date(document.getElementById('gregorianDate').value);
-        if (!isNaN(gregorianDate.getTime())) {
-            const hijriDate = this.convertToHijri(gregorianDate);
-            document.getElementById('hijriDate').value = hijriDate;
-        }
-    }
-    
-    convertToHijri(gregorianDate) {
-        // تحويل مبسط للتاريخ الهجري (للاستخدام الفعلي، يفضل استخدام مكتبة متخصصة)
-        const year = gregorianDate.getFullYear();
-        const month = gregorianDate.getMonth() + 1;
-        const day = gregorianDate.getDate();
-        
-        // تحويل تقريبي (هذه مجرد مثال، التحويل الدقيق يتطلب خوارزمية معقدة)
-        const hijriYear = Math.round((year - 622) * (33/32));
-        const hijriMonth = month;
-        const hijriDay = day;
-        
-        return `${hijriYear}/${hijriMonth.toString().padStart(2, '0')}/${hijriDay.toString().padStart(2, '0')}`;
-    }
-    
-    updateDayName() {
-        const gregorianDate = new Date(document.getElementById('gregorianDate').value);
-        if (!isNaN(gregorianDate.getTime())) {
-            const dayName = this.getDayNameArabic(gregorianDate);
-            document.getElementById('dayName').value = dayName;
-        }
-    }
-    
-    getDayNameArabic(date) {
-        const days = {
-            0: "الأحد",
-            1: "الاثنين",
-            2: "الثلاثاء", 
-            3: "الأربعاء",
-            4: "الخميس",
-            5: "الجمعة",
-            6: "السبت"
-        };
-        return days[date.getDay()];
-    }
-    
-    checkCapacity() {
-        const totalAnimals = parseInt(document.getElementById('maleQty').value || 0) + 
-                            parseInt(document.getElementById('femaleQty').value || 0);
-        const capacity = parseInt(document.getElementById('capacity').value || 0);
-        
-        const alertLabel = document.getElementById('alertLabel');
-        
-        if (capacity > 0 && totalAnimals > capacity) {
-            alertLabel.textContent = `⚠️ تنبيه: العدد ${totalAnimals} يتجاوز السعة ${capacity}`;
-            alertLabel.style.display = 'block';
-        } else {
-            alertLabel.style.display = 'none';
-        }
-    }
-    
-    setAutoBarnNumber() {
-        const nextNumber = this.getNextBarnNumber();
-        const barnNumberSelect = document.getElementById('barnNumber');
-        
-        for (let i = 0; i < barnNumberSelect.options.length; i++) {
-            if (barnNumberSelect.options[i].value === nextNumber) {
-                barnNumberSelect.selectedIndex = i;
-                break;
-            }
-        }
-        
-        this.updateBarnData();
-    }
-    
-    getNextBarnNumber() {
-        if (this.barns.length === 0) return "1";
-        
-        const lastBarn = this.barns.reduce((prev, current) => 
-            (parseInt(prev.رقم_الحظيرة) > parseInt(current.رقم_الحظيرة)) ? prev : current
+        const locationSelect = document.getElementById('location');
+        const locationIndex = Array.from(locationSelect.options).findIndex(
+            option => option.value === appData.barnData[selectedNumber].location
         );
         
-        return (parseInt(lastBarn.رقم_الحظيرة) + 1).toString();
-    }
-    
-    clearFields() {
-        this.selectedId = null;
-        this.setAutoBarnNumber();
-        document.getElementById('barnName').value = '';
-        document.getElementById('animalType').selectedIndex = 0;
-        this.updateAnimalTypes();
-        document.getElementById('location').selectedIndex = 0;
-        document.getElementById('maleQty').value = '0';
-        document.getElementById('femaleQty').value = '0';
-        document.getElementById('totalQuantity').value = '0';
-        document.getElementById('gregorianDate').value = new Date().toISOString().split('T')[0];
-        document.getElementById('supervisor').selectedIndex = 0;
-        document.getElementById('unitPrice').value = '1'; // تعيين القيمة الافتراضية إلى 1
-        document.getElementById('totalPrice').value = '';
-        document.getElementById('alertLabel').style.display = 'none';
-        
-        this.updateHijriDate();
-        this.updateDayName();
-    }
-    
-    saveBarn() {
-        // التحقق من البيانات
-        if (!document.getElementById('barnName').value.trim()) {
-            alert('يرجى إدخال اسم الحظيرة.');
-            return;
+        if (locationIndex >= 0) {
+            locationSelect.selectedIndex = locationIndex;
         }
+    } else if (selectedNumber) {
+        // إذا كان الرقم غير موجود في القاموس، نحدد الاستيعاب بناءً على الرقم
+        const barnNum = parseInt(selectedNumber);
+        const capacityValue = barnNum % 2 === 1 ? 200 : 300;
+        document.getElementById('capacity').value = capacityValue;
+        document.getElementById('barn-name').value = `الحظيرة ${selectedNumber}`;
         
-        if (parseInt(document.getElementById('totalQuantity').value) === 0) {
-            alert('يرجى إدخال كمية الحيوانات.');
-            return;
-        }
-        
-        // التحقق من صحة السعر الفردي (الآن هو رقم مباشرة)
-        const unitPrice = parseInt(document.getElementById('unitPrice').value) || 0;
-        if (unitPrice < 1) {
-            alert('السعر الفردي يجب أن يكون 1 أو أكثر.');
-            document.getElementById('unitPrice').focus();
-            return;
-        }
-        
-        // حساب البيانات
-        const totalAnimals = parseInt(document.getElementById('totalQuantity').value);
-        const capacity = parseInt(document.getElementById('capacity').value);
-        const alertFlag = totalAnimals > capacity && capacity > 0;
-        const totalPrice = unitPrice * totalAnimals;
-        
-        const barnData = {
-            رقم_الحظيرة: document.getElementById('barnNumber').value,
-            اسم_الحظيرة: document.getElementById('barnName').value,
-            الاستيعاب: capacity,
-            الصنف: document.getElementById('animalType').value,
-            النوع: document.getElementById('gender').value,
-            الموقع: document.getElementById('location').value,
-            كمية_ذكور: parseInt(document.getElementById('maleQty').value),
-            كمية_إناث: parseInt(document.getElementById('femaleQty').value),
-            الإجمالي: totalAnimals,
-            تاريخ_الهجري: document.getElementById('hijriDate').value,
-            تاريخ_الميلادي: document.getElementById('gregorianDate').value,
-            المشرف: document.getElementById('supervisor').value,
-            السعر_الفردي: unitPrice, // الآن هو رقم مباشرة
-            إجمالي_السعر: totalPrice,
-            التنبيه: alertFlag,
-            تاريخ_الإضافة: new Date().toISOString()
-        };
-        
-        try {
-            if (this.selectedId) {
-                // تحديث الحظيرة
-                const index = this.barns.findIndex(barn => barn.id === this.selectedId);
-                if (index !== -1) {
-                    this.barns[index] = { ...this.barns[index], ...barnData };
-                }
-            } else {
-                // إضافة حظيرة جديدة
-                barnData.id = Date.now().toString();
-                this.barns.push(barnData);
-            }
-            
-            // حفظ في localStorage
-            localStorage.setItem('barns', JSON.stringify(this.barns));
-            
-            alert(this.selectedId ? 'تم تحديث الحظيرة بنجاح!' : 'تم إضافة الحظيرة بنجاح!');
-            this.clearFields();
-            this.loadData();
-            
-        } catch (error) {
-            alert('حدث خطأ أثناء الحفظ: ' + error.message);
-        }
-    }
-    
-    deleteBarn() {
-        if (!this.selectedId) {
-            alert('يرجى اختيار حظيرة أولاً.');
-            return;
-        }
-        
-        if (confirm('هل تريد حذف الحظيرة المحددة؟')) {
-            try {
-                this.barns = this.barns.filter(barn => barn.id !== this.selectedId);
-                localStorage.setItem('barns', JSON.stringify(this.barns));
-                
-                alert('تم حذف الحظيرة بنجاح!');
-                this.clearFields();
-                this.loadData();
-                
-            } catch (error) {
-                alert('حدث خطأ أثناء الحذف: ' + error.message);
-            }
-        }
-    }
-    
-    loadData(searchTerm = '') {
-        let filteredBarns = this.barns;
-        
-        if (searchTerm) {
-            filteredBarns = this.barns.filter(barn => 
-                barn.اسم_الحظيرة.includes(searchTerm) ||
-                barn.الصنف.includes(searchTerm) ||
-                barn.رقم_الحظيرة.includes(searchTerm)
-            );
-        }
-        
-        const tableBody = document.getElementById('barnsTableBody');
-        tableBody.innerHTML = '';
-        
-        filteredBarns.forEach(barn => {
-            const row = document.createElement('tr');
-            
-            // إضافة بيانات الصف
-            const columns = [
-                barn.رقم_الحظيرة,
-                barn.اسم_الحظيرة,
-                barn.تاريخ_الميلادي,
-                barn.الاستيعاب,
-                barn.الصنف,
-                this.getDayMonth(barn.تاريخ_الميلادي),
-                barn.النوع,
-                barn.الموقع,
-                barn.كمية_ذكور,
-                barn.كمية_إناث,
-                barn.الإجمالي,
-                this.formatPrice(barn.السعر_الفردي),
-                this.formatPrice(barn.إجمالي_السعر)
-            ];
-            
-            columns.forEach((value, index) => {
-                const cell = document.createElement('td');
-                cell.textContent = value;
-                
-                // تلوين الأعمدة العددية
-                if ([3, 8, 9, 10].includes(index)) {
-                    cell.style.backgroundColor = '#f8f9fa';
-                    cell.style.textAlign = 'center';
-                    cell.style.fontWeight = 'bold';
-                    
-                    // تكبير خط الاستيعاب في الجدول أيضاً
-                    if (index === 3) {
-                        cell.style.fontSize = '14pt';
-                        cell.style.color = '#16a085';
-                        cell.style.background = 'linear-gradient(to bottom, #e8f6f3, #d1f2eb)';
-                    }
-                }
-                
-                row.appendChild(cell);
-            });
-            
-            // إضافة أزرار الإجراءات
-            const actionsCell = document.createElement('td');
-            
-            const editBtn = document.createElement('button');
-            editBtn.textContent = 'تعديل';
-            editBtn.className = 'action-btn edit-btn';
-            editBtn.addEventListener('click', () => this.loadSelectedBarn(barn.id));
-            
-            const deleteBtn = document.createElement('button');
-            deleteBtn.textContent = 'حذف';
-            deleteBtn.className = 'action-btn delete-btn';
-            deleteBtn.addEventListener('click', () => {
-                this.selectedId = barn.id;
-                this.deleteBarn();
-            });
-            
-            actionsCell.appendChild(editBtn);
-            actionsCell.appendChild(deleteBtn);
-            row.appendChild(actionsCell);
-            
-            tableBody.appendChild(row);
-        });
-        
-        this.updateStatistics();
-    }
-    
-    loadSelectedBarn(barnId) {
-        const barn = this.barns.find(b => b.id === barnId);
-        if (!barn) return;
-        
-        this.selectedId = barnId;
-        
-        // تعبئة الحقول من البيانات
-        document.getElementById('barnNumber').value = barn.رقم_الحظيرة;
-        document.getElementById('barnName').value = barn.اسم_الحظيرة;
-        document.getElementById('capacity').value = barn.الاستيعاب;
-        document.getElementById('animalType').value = barn.الصنف;
-        
-        // تحديث أنواع الحيوانات بناءً على الصنف
-        this.updateAnimalTypes();
-        
-        setTimeout(() => {
-            document.getElementById('gender').value = barn.النوع;
-        }, 100);
-        
-        document.getElementById('location').value = barn.الموقع;
-        document.getElementById('maleQty').value = barn.كمية_ذكور;
-        document.getElementById('femaleQty').value = barn.كمية_إناث;
-        document.getElementById('totalQuantity').value = barn.الإجمالي;
-        document.getElementById('hijriDate').value = barn.تاريخ_الهجري;
-        document.getElementById('gregorianDate').value = barn.تاريخ_الميلادي;
-        document.getElementById('supervisor').value = barn.المشرف;
-        document.getElementById('unitPrice').value = barn.السعر_الفردي || 1; // القيمة الافتراضية 1 إذا كانت غير موجودة
-        document.getElementById('totalPrice').value = this.formatPrice(barn.إجمالي_السعر);
-        
-        this.updateDayName();
-        this.checkCapacity();
-    }
-    
-    searchBarns() {
-        const searchTerm = document.getElementById('searchInput').value;
-        this.loadData(searchTerm);
-    }
-    
-    updateStatistics() {
-        const totalBarns = this.barns.length;
-        const totalAnimals = this.barns.reduce((sum, barn) => sum + (barn.الإجمالي || 0), 0);
-        
-        document.getElementById('totalBarns').textContent = `عدد الحظائر: ${totalBarns}`;
-        document.getElementById('totalAnimals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
-    }
-    
-    getDayMonth(dateValue) {
-        if (!dateValue) return "";
-        try {
-            const date = new Date(dateValue);
-            return `${date.getDate()}/${date.getMonth() + 1}`;
-        } catch (error) {
-            return "";
-        }
-    }
-    
-    formatPrice(priceValue) {
-        if (!priceValue) return "0.00 ريال";
-        try {
-            return `${parseFloat(priceValue).toFixed(2)} ريال`;
-        } catch (error) {
-            return "0.00 ريال";
+        // توزيع المواقع تلقائياً
+        const locationSelect = document.getElementById('location');
+        const locationIndex = barnNum % 5;
+        if (locationIndex < locationSelect.options.length) {
+            locationSelect.selectedIndex = locationIndex + 1; // +1 بسبب خيار "-- اختر الموقع --"
         }
     }
 }
 
-// تهيئة التطبيق عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', () => {
-    new BarnApp();
-});
+function setAutoBarnNumber() {
+    // الحصول على آخر رقم حظيرة وإنشاء الرقم التالي
+    let nextNumber = 1;
+    if (appData.barns.length > 0) {
+        const lastBarn = appData.barns[appData.barns.length - 1];
+        nextNumber = parseInt(lastBarn.barnNumber) + 1;
+    }
+    
+    const barnNumberSelect = document.getElementById('barn-number');
+    const optionIndex = Array.from(barnNumberSelect.options).findIndex(
+        option => option.value === nextNumber.toString()
+    );
+    
+    if (optionIndex >= 0) {
+        barnNumberSelect.selectedIndex = optionIndex;
+    } else {
+        barnNumberSelect.value = nextNumber.toString();
+    }
+    
+    updateBarnData();
+}
+
+function updateTotals() {
+    const maleQty = parseInt(document.getElementById('male-qty').value) || 0;
+    const femaleQty = parseInt(document.getElementById('female-qty').value) || 0;
+    const totalQty = maleQty + femaleQty;
+    
+    document.getElementById('total-qty').value = totalQty;
+    
+    // حساب إجمالي السعر
+    const unitPrice = parseFloat(document.getElementById('unit-price').value) || 0;
+    const totalPrice = unitPrice * totalQty;
+    
+    document.getElementById('total-price').value = totalPrice.toFixed(2);
+}
+
+function checkCapacity() {
+    const totalAnimals = (parseInt(document.getElementById('male-qty').value) || 0) + 
+                        (parseInt(document.getElementById('female-qty').value) || 0);
+    const capacity = parseInt(document.getElementById('capacity').value) || 0;
+    const alertMessage = document.getElementById('alert-message');
+    
+    if (capacity > 0 && totalAnimals > capacity) {
+        alertMessage.textContent = `⚠️ تنبيه: العدد ${totalAnimals} يتجاوز السعة ${capacity}`;
+        alertMessage.classList.remove('hidden');
+    } else {
+        alertMessage.classList.add('hidden');
+    }
+}
+
+function updateHijriDate() {
+    const gregorianDate = new Date(document.getElementById('gregorian-date').value);
+    
+    // تحويل التاريخ الميلادي إلى هجري (محاكاة)
+    // في التطبيق الحقيقي، يمكن استخدام مكتبة مثل hijri-date
+    const hijriDate = convertToHijri(gregorianDate);
+    document.getElementById('hijri-date').value = hijriDate;
+}
+
+function updateDayName() {
+    const gregorianDate = new Date(document.getElementById('gregorian-date').value);
+    const dayName = getDayNameArabic(gregorianDate);
+    document.getElementById('day-name').value = dayName;
+}
+
+function convertToHijri(gregorianDate) {
+    // محاكاة للتحويل إلى التاريخ الهجري
+    // في التطبيق الحقيقي، يمكن استخدام مكتبة متخصصة
+    const year = gregorianDate.getFullYear() - 621;
+    const month = (gregorianDate.getMonth() + 1) % 12 || 12;
+    const day = gregorianDate.getDate();
+    
+    return `${year}/${month.toString().padStart(2, '0')}/${day.toString().padStart(2, '0')}`;
+}
+
+function getDayNameArabic(date) {
+    const days = {
+        0: "الأحد",
+        1: "الاثنين",
+        2: "الثلاثاء",
+        3: "الأربعاء",
+        4: "الخميس",
+        5: "الجمعة",
+        6: "السببت"
+    };
+    return days[date.getDay()];
+}
+
+// دوال إضافة عناصر جديدة للقوائم المرجعية
+function addNewSpecies() {
+    const input = document.getElementById('animal-type');
+    const value = input.value.trim();
+    
+    if (value && !appData.species.includes(value)) {
+        appData.species.push(value);
+        appData.types[value] = [];
+        saveData();
+        loadLookups();
+        input.value = value;
+    }
+}
+
+function addNewType() {
+    const input = document.getElementById('gender');
+    const value = input.value.trim();
+    const animalType = document.getElementById('animal-type').value;
+    
+    if (value && animalType && !appData.types[animalType].includes(value)) {
+        appData.types[animalType].push(value);
+        saveData();
+        updateAnimalTypes();
+        input.value = value;
+    }
+}
+
+function addNewLocation() {
+    const input = document.getElementById('location');
+    const value = input.value.trim();
+    
+    if (value && !appData.locations.includes(value)) {
+        appData.locations.push(value);
+        saveData();
+        loadLookups();
+        input.value = value;
+    }
+}
+
+function addNewSupervisor() {
+    const input = document.getElementById('supervisor');
+    const value = input.value.trim();
+    
+    if (value && !appData.supervisors.includes(value)) {
+        appData.supervisors.push(value);
+        saveData();
+        loadLookups();
+        input.value = value;
+    }
+}
+
+// دوال العمليات الرئيسية
+function clearForm() {
+    appData.selectedBarnId = null;
+    document.getElementById('barn-form').reset();
+    setAutoBarnNumber();
+    updateHijriDate();
+    updateDayName();
+    document.getElementById('alert-message').classList.add('hidden');
+}
+
+function saveBarn() {
+    // التحقق من صحة البيانات
+    if (!validateForm()) {
+        return;
+    }
+    
+    const barnData = {
+        barnNumber: document.getElementById('barn-number').value,
+        barnName: document.getElementById('barn-name').value,
+        capacity: parseInt(document.getElementById('capacity').value) || 0,
+        animalType: document.getElementById('animal-type').value,
+        gender: document.getElementById('gender').value,
+        location: document.getElementById('location').value,
+        maleQty: parseInt(document.getElementById('male-qty').value) || 0,
+        femaleQty: parseInt(document.getElementById('female-qty').value) || 0,
+        totalQty: parseInt(document.getElementById('total-qty').value) || 0,
+        hijriDate: document.getElementById('hijri-date').value,
+        gregorianDate: document.getElementById('gregorian-date').value,
+        dayName: document.getElementById('day-name').value,
+        supervisor: document.getElementById('supervisor').value,
+        unitPrice: parseFloat(document.getElementById('unit-price').value) || 0,
+        totalPrice: parseFloat(document.getElementById('total-price').value) || 0,
+        alert: document.getElementById('alert-message').classList.contains('hidden') ? 0 : 1
+    };
+    
+    if (appData.selectedBarnId !== null) {
+        // تحديث حظيرة موجودة
+        const index = appData.barns.findIndex(barn => barn.id === appData.selectedBarnId);
+        if (index !== -1) {
+            barnData.id = appData.selectedBarnId;
+            appData.barns[index] = barnData;
+        }
+    } else {
+        // إضافة حظيرة جديدة
+        barnData.id = Date.now().toString();
+        appData.barns.push(barnData);
+    }
+    
+    saveData();
+    loadData();
+    clearForm();
+    
+    alert(appData.selectedBarnId !== null ? "تم تحديث الحظيرة بنجاح!" : "تم إضافة الحظيرة بنجاح!");
+}
+
+function validateForm() {
+    const barnName = document.getElementById('barn-name').value.trim();
+    const totalQty = parseInt(document.getElementById('total-qty').value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unit-price').value) || 0;
+    
+    if (!barnName) {
+        alert("يرجى إدخال اسم الحظيرة.");
+        return false;
+    }
+    
+    if (totalQty === 0) {
+        alert("يرجى إدخال كمية الحيوانات.");
+        return false;
+    }
+    
+    if (unitPrice <= 0) {
+        alert("يرجى إدخال سعر فردي صحيح.");
+        return false;
+    }
+    
+    return true;
+}
+
+function loadData() {
+    const tableBody = document.getElementById('barns-table-body');
+    tableBody.innerHTML = '';
+    
+    appData.barns.forEach(barn => {
+        const row = tableBody.insertRow();
+        
+        // إضافة خلايا الجدول
+        const cells = [
+            barn.barnNumber,
+            barn.barnName,
+            formatDate(barn.gregorianDate),
+            barn.capacity,
+            barn.animalType,
+            getDayMonth(barn.gregorianDate),
+            barn.gender,
+            barn.location,
+            barn.maleQty,
+            barn.femaleQty,
+            barn.totalQty,
+            formatPrice(barn.unitPrice),
+            formatPrice(barn.totalPrice)
+        ];
+        
+        cells.forEach((cellData, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = cellData;
+            
+            // تلوين الأعمدة العددية
+            if (index === 3 || index === 8 || index === 9 || index === 10) {
+                cell.style.backgroundColor = '#f8f9fa';
+                cell.style.fontWeight = 'bold';
+            }
+        });
+        
+        // إضافة خلية الإجراءات
+        const actionsCell = row.insertCell();
+        const editButton = document.createElement('button');
+        editButton.textContent = 'تعديل';
+        editButton.className = 'btn btn-small';
+        editButton.style.backgroundColor = '#3498db';
+        editButton.style.color = 'white';
+        editButton.style.marginRight = '5px';
+        editButton.style.padding = '5px 10px';
+        editButton.style.fontSize = '12px';
+        editButton.onclick = () => loadBarnIntoForm(barn.id);
+        
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'حذف';
+        deleteButton.className = 'btn btn-small';
+        deleteButton.style.backgroundColor = '#e74c3c';
+        deleteButton.style.color = 'white';
+        deleteButton.style.padding = '5px 10px';
+        deleteButton.style.fontSize = '12px';
+        deleteButton.onclick = () => prepareDelete(barn.id);
+        
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(deleteButton);
+        
+        // إضافة حدث النقر على الصف
+        row.addEventListener('click', () => {
+            // إزالة التحديد من جميع الصفوف
+            Array.from(tableBody.rows).forEach(r => r.classList.remove('selected'));
+            // تحديد الصف الحالي
+            row.classList.add('selected');
+        });
+    });
+    
+    updateStatistics();
+}
+
+function updateStatistics() {
+    const totalBarns = appData.barns.length;
+    const totalAnimals = appData.barns.reduce((sum, barn) => sum + (barn.totalQty || 0), 0);
+    
+    document.getElementById('total-barns').textContent = totalBarns;
+    document.getElementById('total-animals').textContent = totalAnimals;
+}
+
+function loadBarnIntoForm(barnId) {
+    const barn = appData.barns.find(b => b.id === barnId);
+    if (!barn) return;
+    
+    appData.selectedBarnId = barnId;
+    
+    // تعبئة الحقول من البيانات
+    document.getElementById('barn-number').value = barn.barnNumber;
+    document.getElementById('barn-name').value = barn.barnName;
+    document.getElementById('capacity').value = barn.capacity;
+    document.getElementById('animal-type').value = barn.animalType;
+    document.getElementById('gender').value = barn.gender;
+    document.getElementById('location').value = barn.location;
+    document.getElementById('male-qty').value = barn.maleQty;
+    document.getElementById('female-qty').value = barn.femaleQty;
+    document.getElementById('total-qty').value = barn.totalQty;
+    document.getElementById('hijri-date').value = barn.hijriDate;
+    document.getElementById('gregorian-date').value = barn.gregorianDate;
+    document.getElementById('day-name').value = barn.dayName;
+    document.getElementById('supervisor').value = barn.supervisor;
+    document.getElementById('unit-price').value = barn.unitPrice;
+    document.getElementById('total-price').value = barn.totalPrice;
+    
+    // تحديث أنواع الحيوانات
+    updateAnimalTypes();
+    
+    // التحقق من السعة
+    checkCapacity();
+}
+
+function prepareDelete(barnId) {
+    appData.selectedBarnId = barnId;
+    document.getElementById('confirm-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('confirm-modal').classList.add('hidden');
+    appData.selectedBarnId = null;
+}
+
+function confirmDelete() {
+    if (appData.selectedBarnId) {
+        const index = appData.barns.findIndex(barn => barn.id === appData.selectedBarnId);
+        if (index !== -1) {
+            appData.barns.splice(index, 1);
+            saveData();
+            loadData();
+            clearForm();
+            alert("تم حذف الحظيرة بنجاح!");
+        }
+    }
+    closeModal();
+}
+
+function deleteBarn() {
+    if (appData.selectedBarnId) {
+        prepareDelete(appData.selectedBarnId);
+    } else {
+        alert("يرجى اختيار حظيرة أولاً.");
+    }
+}
+
+// دوال مساعدة
+function formatDate(dateValue) {
+    if (!dateValue) return "";
+    const date = new Date(dateValue);
+    return date.toLocaleDateString('ar-EG');
+}
+
+function formatPrice(priceValue) {
+    if (!priceValue) return "0";
+    return parseFloat(priceValue).toLocaleString('ar-EG', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function getDayMonth(dateValue) {
+    if (!dateValue) return "";
+    const date = new Date(dateValue);
+    return `${date.getDate()}/${date.getMonth() + 1}`;
+}
+
+function goBack() {
+    if (confirm("هل تريد الرجوع للقائمة الرئيسية؟")) {
+        // في التطبيق الحقيقي، يمكن توجيه المستخدم إلى الصفحة الرئيسية
+        alert("الرجوع للقائمة الرئيسية");
+    }
+}

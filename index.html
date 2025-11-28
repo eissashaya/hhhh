@@ -853,22 +853,23 @@
             }
         }
 
-        // وظائف الصفحات الأخرى (محاكاة)
-        function showBarnPage() { alert('فتح صفحة إضافة حظيرة'); }
-        function showBabyPage() { alert('فتح صفحة إضافة مواليد'); }
-        function showSheepPage() { alert('فتح صفحة إضافة أغنام'); }
-        function showBarnDataPage() { alert('فتح صفحة بيانات الحظائر'); }
-        function showSalesPage() { alert('فتح صفحة حركة المبيعات'); }
-        function showPurchasesPage() { alert('فتح صفحة إضافة مشتريات'); }
-        function showBabyMovementPage() { alert('فتح صفحة حركة المواليد'); }
-        function showReportsPage() { alert('فتح صفحة معاينة التقارير'); }
-        function showStatisticsPage() { alert('فتح صفحة إحصائيات متعددة'); }
-        function showMedicationsPage() { alert('فتح صفحة الجرعات الدوائية'); }
-        function showWarehousePage() { alert('فتح صفحة حركة المستودع'); }
-        function showMotherNotesPage() { alert('فتح صفحة ملاحظات الأمهات'); }
-        function showUserPermissionsPage() { alert('فتح صفحة صلاحيات المستخدم'); }
-        function showHrPage() { alert('فتح صفحة الموارد البشرية'); }
-        function showSheepStagesPage() { alert('فتح صفحة مراحل الأغنام'); }
+        // وظائف الصفحات الأخرى (روابط إلى صفحات فعلية إن توفرت)
+        function showBarnPage() { window.location.href = './اضافه حظائر/index.html'; }
+        function showBabyPage() { window.location.href = './اضافه مواليد/index.html'; }
+        function showSheepPage() { window.location.href = './اضافه اغنام/index.html'; }
+        // الصفحات التالية تبقى كتنبيه مؤقت في حال لم تكن موجودة بعد
+        function showBarnDataPage() { alert('فتح صفحة بيانات الحظائر (الصفحة غير متوفرة محلياً)'); }
+        function showSalesPage() { alert('فتح صفحة حركة المبيعات (الصفحة غير متوفرة محلياً)'); }
+        function showPurchasesPage() { alert('فتح صفحة إضافة مشتريات (الصفحة غير متوفرة محلياً)'); }
+        function showBabyMovementPage() { alert('فتح صفحة حركة المواليد (الصفحة غير متوفرة محلياً)'); }
+        function showReportsPage() { alert('فتح صفحة معاينة التقارير (الصفحة غير متوفرة محلياً)'); }
+        function showStatisticsPage() { alert('فتح صفحة إحصائيات متعددة (الصفحة غير متوفرة محلياً)'); }
+        function showMedicationsPage() { alert('فتح صفحة الجرعات الدوائية (الصفحة غير متوفرة محلياً)'); }
+        function showWarehousePage() { alert('فتح صفحة حركة المستودع (الصفحة غير متوفرة محلياً)'); }
+        function showMotherNotesPage() { alert('فتح صفحة ملاحظات الأمهات (الصفحة غير متوفرة محلياً)'); }
+        function showUserPermissionsPage() { alert('فتح صفحة صلاحيات المستخدم (الصفحة غير متوفرة محلياً)'); }
+        function showHrPage() { alert('فتح صفحة الموارد البشرية (الصفحة غير متوفرة محلياً)'); }
+        function showSheepStagesPage() { alert('فتح صفحة مراحل الأغنام (الصفحة غير متوفرة محلياً)'); }
 
         // التهيئة عند تحميل الصفحة
         window.onload = function() {

@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏠 نظام إدارة الحظائر</title>
+    <style>
+        /* تنسيقات عامة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 3px solid #3498db;
+        }
+
+        /* تنسيق العنوان */
+        .header {
+            background: linear-gradient(to right, #2c3e50, #3498db);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #2980b9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .back-btn {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid #e74c3c;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(to bottom, #c0392b, #a93226);
+            border-color: #c0392b;
+        }
+
+        /* تنسيق الإحصائيات */
+        .stats {
+            background: linear-gradient(to right, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px;
+            display: flex;
+            justify-content: space-around;
+            border: 2px solid #27ae60;
+        }
+
+        .stats div {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* تنسيق الأعمدة */
+        .columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 15px;
+        }
+
+        .column {
+            flex: 1;
+            min-width: 250px;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .column-1 {
+            border: 2px solid #3498db;
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+        }
+
+        .column-2 {
+            border: 2px solid #e67e22;
+            background: linear-gradient(to bottom, #fef9e7, #fcf3cf);
+        }
+
+        .column-3 {
+            border: 2px solid #9b59b6;
+            background: linear-gradient(to bottom, #f4ecf7, #e8daef);
+        }
+
+        .column-4 {
+            border: 2px solid #1abc9c;
+            background: linear-gradient(to bottom, #e8f6f3, #d1f2eb);
+        }
+
+        .column-5 {
+            border: 2px solid #f39c12;
+            background: linear-gradient(to bottom, #fef5e7, #fdebd0);
+        }
+
+        .column-title {
+            background: linear-gradient(to bottom, #34495e, #2c3e50);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #2c3e50;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dcdde1;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            background-color: #ecf0f1;
+            outline: none;
+        }
+
+        /* تنسيق الأزرار */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .btn-new {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            border: 2px solid #3498db;
+        }
+
+        .btn-save {
+            background: linear-gradient(to bottom, #27ae60, #219a52);
+            color: white;
+            border: 2px solid #27ae60;
+        }
+
+        .btn-view {
+            background: linear-gradient(to bottom, #9b59b6, #8e44ad);
+            color: white;
+            border: 2px solid #9b59b6;
+        }
+
+        .btn-delete {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            border: 2px solid #e74c3c;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* تنسيق حاوية الجدول مع شريط التمرير */
+        .table-container {
+            margin: 15px;
+            border: 2px solid #34495e;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .table-title {
+            background: linear-gradient(to right, #2c3e50, #34495e);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            border-bottom: 2px solid #2c3e50;
+        }
+
+        .table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            min-width: 1200px; /* عرض أدنى للجدول لضمان عدم انضغاط الأعمدة */
+        }
+
+        .data-table thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table th {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: bold;
+            border-right: 1px solid #2980b9;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 8px;
+            border-bottom: 1px solid #ecf0f1;
+            text-align: center;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tr:hover {
+            background-color: #e3f2fd;
+            cursor: pointer;
+        }
+
+        /* تنسيق التنبيه */
+        .alert {
+            background: linear-gradient(to bottom, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 12px;
+            border: 2px solid #e74c3c;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+
+        /* تخصيص بعض العناصر */
+        .day-name {
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #27ae60;
+        }
+
+        .total-price {
+            background: linear-gradient(to bottom, #e8f4ff, #d6eaf8);
+            border: 2px solid #3498db;
+            color: #2980b9;
+            font-weight: bold;
+        }
+
+        .capacity-input {
+            background-color: #e8f6f3;
+            border: 2px solid #1abc9c;
+            color: #16a085;
+            font-weight: bold;
+        }
+
+        /* تخصيص شريط التمرير */
+        .table-wrapper::-webkit-scrollbar {
+            width: 12px;
+            height: 12px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+
+        .table-wrapper::-webkit-scrollbar-corner {
+            background: #f0f0f0;
+        }
+
+        /* تنسيق للشاشات الصغيرة */
+        @media (max-width: 1200px) {
+            .columns {
+                flex-direction: column;
+            }
+            
+            .column {
+                min-width: 100%;
+            }
+            
+            .buttons {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                flex: 1;
+                min-width: 150px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 6px 4px;
+            }
+            
+            .table-wrapper {
+                max-height: 400px;
+            }
+        }
+
+        /* تنسيقات التحميل والرسائل */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .success-message {
+            display: none;
+            background: linear-gradient(to bottom, #2ecc71, #27ae60);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 15px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            display: none;
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 10px 15px;
+            font-weight: bold;
+        }
+
+        /* تنسيق حقل رقم الحظيرة */
+        .barn-number-container {
+            position: relative;
+        }
+
+        .barn-number-status {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .available {
+            color: #27ae60;
+        }
+
+        .taken {
+            color: #e74c3c;
+        }
+
+        /* مؤشر عدد الصفوف */
+        .row-count {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            text-align: left;
+            font-size: 14px;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* تنسيقات إضافية للمحتوى المختار */
+        .selected-row {
+            background-color: #d6eaf8 !important;
+            border-left: 3px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- العنوان وزر الرجوع -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">⬅ الرجوع للقائمة الرئيسية</button>
+            <h1>🏠 نظام إدارة الحظائر</h1>
+        </div>
+
+        <!-- رسالة النجاح -->
+        <div class="success-message" id="success-message"></div>
+
+        <!-- رسالة الخطأ -->
+        <div class="error-message" id="error-message"></div>
+
+        <!-- الإحصائيات -->
+        <div class="stats">
+            <div id="total-barns">عدد الحظائر: 0</div>
+            <div id="total-animals">إجمالي الحيوانات: 0</div>
+        </div>
+
+        <!-- الأعمدة الخمسة -->
+        <div class="columns">
+            <!-- العمود الأول: معلومات الحظيرة -->
+            <div class="column column-1">
+                <div class="column-title">معلومات الحظيرة</div>
+                <div class="form-group barn-number-container">
+                    <label for="barn-number">رقم الحظيرة:</label>
+                    <select id="barn-number">
+                        <!-- سيتم تعبئة الخيارات ديناميكياً -->
+                    </select>
+                    <span class="barn-number-status" id="barn-number-status">✓</span>
+                </div>
+                <div class="form-group">
+                    <label for="barn-name">اسم الحظيرة:</label>
+                    <input type="text" id="barn-name" placeholder="سيتم تعبئته تلقائياً" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="capacity">الاستيعاب:</label>
+                    <input type="number" id="capacity" class="capacity-input" min="0" max="10000" value="0">
+                </div>
+            </div>
+
+            <!-- العمود الثاني: معلومات الحيوانات -->
+            <div class="column column-2">
+                <div class="column-title">معلومات الحيوانات</div>
+                <div class="form-group">
+                    <label for="animal-type">الصنف:</label>
+                    <select id="animal-type">
+                        <option value="أغنام">أغنام</option>
+                        <option value="أبقار">أبقار</option>
+                        <option value="ماعز">ماعز</option>
+                        <option value="جمال">جمال</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="gender">النوع:</label>
+                    <select id="gender">
+                        <option value="حري">حري</option>
+                        <option value="نجدي">نجدي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">الموقع:</label>
+                    <select id="location">
+                        <option value="شمال المزرعة">شمال المزرعة</option>
+                        <option value="جنوب المزرعة">جنوب المزرعة</option>
+                        <option value="شرق المزرعة">شرق المزرعة</option>
+                        <option value="غرب المزرعة">غرب المزرعة</option>
+                        <option value="وسط المزرعة">وسط المزرعة</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- العمود الثالث: الكميات -->
+            <div class="column column-3">
+                <div class="column-title">الكميات</div>
+                <div class="form-group">
+                    <label for="male-qty">كمية الذكور:</label>
+                    <input type="number" id="male-qty" min="0" max="10000" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="female-qty">كمية الإناث:</label>
+                    <input type="number" id="female-qty" min="0" max="10000" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="total-quantity">الإجمالي:</label>
+                    <input type="number" id="total-quantity" class="capacity-input" min="0" max="20000" value="0" readonly>
+                </div>
+            </div>
+
+            <!-- العمود الرابع: التواريخ والمشرف -->
+            <div class="column column-4">
+                <div class="column-title">التواريخ والمشرف</div>
+                <div class="form-group">
+                    <label for="hijri-date">التاريخ الهجري:</label>
+                    <input type="text" id="hijri-date" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="gregorian-date">تاريخ الشراء:</label>
+                    <input type="date" id="gregorian-date">
+                </div>
+                <div class="form-group">
+                    <label>اسم اليوم:</label>
+                    <div class="day-name" id="day-name"></div>
+                </div>
+                <div class="form-group">
+                    <label for="supervisor">المشرف على العملية:</label>
+                    <select id="supervisor">
+                        <option value="عيسى شايع">عيسى شايع</option>
+                        <option value="محمد أحمد">محمد أحمد</option>
+                        <option value="خالد سالم">خالد سالم</option>
+                        <option value="أحمد علي">أحمد علي</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- العمود الخامس: الأسعار والتنبيه -->
+            <div class="column column-5">
+                <div class="column-title">الأسعار والتنبيه</div>
+                <div class="form-group">
+                    <label for="unit-price">السعر الفردي:</label>
+                    <input type="text" id="unit-price" placeholder="أدخل السعر الفردي...">
+                </div>
+                <div class="form-group">
+                    <label for="total-price">إجمالي السعر:</label>
+                    <input type="text" id="total-price" class="total-price" readonly placeholder="سيتم حسابه تلقائياً">
+                </div>
+                <div class="alert" id="alert-label"></div>
+            </div>
+        </div>
+
+        <!-- أزرار العمليات -->
+        <div class="buttons">
+            <button class="btn btn-new" onclick="clearFields()">🆕 جديد</button>
+            <button class="btn btn-save" onclick="saveBarn()">💾 حفظ</button>
+            <button class="btn btn-view" onclick="loadData()">📊 عرض البيانات</button>
+            <button class="btn btn-delete" onclick="deleteBarn()">🗑️ حذف</button>
+        </div>
+
+        <!-- مؤشر التحميل -->
+        <div class="loading" id="loading">جاري الحفظ...</div>
+
+        <!-- جدول البيانات -->
+        <div class="table-container">
+            <div class="table-title">📊 بيانات الحظائر</div>
+            <div class="table-wrapper" id="table-wrapper">
+                <table class="data-table" id="data-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الحظيرة</th>
+                            <th>اسم الحظيرة</th>
+                            <th>تاريخ الشراء</th>
+                            <th>الاستيعاب</th>
+                            <th>الصنف</th>
+                            <th>اليوم/الشهر</th>
+                            <th>النوع</th>
+                            <th>الموقع</th>
+                            <th>كمية ذكور</th>
+                            <th>كمية إناث</th>
+                            <th>الإجمالي</th>
+                            <th>السعر الفردي</th>
+                            <th>إجمالي السعر</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- سيتم ملء البيانات هنا بواسطة JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="row-count" id="row-count">عدد الصفوف: 0</div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات التطبيق
+        let selectedId = null;
+        let barns = [];
+        let selectedRow = null;
+        
+        // بيانات الحظائر المحددة مسبقاً
+        const barnData = {
+            "1": {"name": "الحظيرة الأولى", "location": "شمال المزرعة", "capacity": 200},
+            "2": {"name": "الحظيرة الثانية", "location": "جنوب المزرعة", "capacity": 300},
+            "3": {"name": "الحظيرة الثالثة", "location": "شرق المزرعة", "capacity": 200},
+            "4": {"name": "الحظيرة الرابعة", "location": "غرب المزرعة", "capacity": 300},
+            "5": {"name": "الحظيرة الخامسة", "location": "وسط المزرعة", "capacity": 200},
+            "6": {"name": "الحظيرة السادسة", "location": "شمال المزرعة", "capacity": 300},
+            "7": {"name": "الحظيرة السابعة", "location": "جنوب المزرعة", "capacity": 200},
+            "8": {"name": "الحظيرة الثامنة", "location": "شرق المزرعة", "capacity": 300},
+            "9": {"name": "الحظيرة التاسعة", "location": "غرب المزرعة", "capacity": 200},
+            "10": {"name": "الحظيرة العاشرة", "location": "وسط المزرعة", "capacity": 300},
+            "11": {"name": "الحظيرة الحادية عشر", "location": "شمال المزرعة", "capacity": 200},
+            "12": {"name": "الحظيرة الثانية عشر", "location": "جنوب المزرعة", "capacity": 300},
+            "13": {"name": "الحظيرة الثالثة عشر", "location": "شرق المزرعة", "capacity": 200},
+            "14": {"name": "الحظيرة الرابعة عشر", "location": "غرب المزرعة", "capacity": 300},
+            "15": {"name": "الحظيرة الخامسة عشر", "location": "وسط المزرعة", "capacity": 200},
+            "16": {"name": "الحظيرة السادسة عشر", "location": "شمال المزرعة", "capacity": 300},
+            "17": {"name": "الحظيرة السابعة عشر", "location": "جنوب المزرعة", "capacity": 200},
+            "18": {"name": "الحظيرة الثامنة عشر", "location": "شرق المزرعة", "capacity": 300},
+            "19": {"name": "الحظيرة التاسعة عشر", "location": "غرب المزرعة", "capacity": 200},
+            "20": {"name": "الحظيرة العشرون", "location": "وسط المزرعة", "capacity": 300}
+        };
+
+        // أنواع الحيوانات لكل صنف
+        const animalTypesMapping = {
+            "أغنام": ["حري", "نجدي"],
+            "أبقار": ["نجدي", "حري"],
+            "ماعز": ["شامي", "حري"],
+            "جمال": ["نجدي", "حري"]
+        };
+
+        // أسماء الأرقام بالعربية
+        const arabicNumbers = {
+            1: "الأولى",
+            2: "الثانية", 
+            3: "الثالثة",
+            4: "الرابعة",
+            5: "الخامسة",
+            6: "السادسة",
+            7: "السابعة",
+            8: "الثامنة",
+            9: "التاسعة",
+            10: "العاشرة",
+            11: "الحادية عشر",
+            12: "الثانية عشر",
+            13: "الثالثة عشر",
+            14: "الرابعة عشر",
+            15: "الخامسة عشر",
+            16: "السادسة عشر",
+            17: "السابعة عشر",
+            18: "الثامنة عشر",
+            19: "التاسعة عشر",
+            20: "العشرون"
+        };
+
+        // تهيئة التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // تعيين التاريخ الحالي كافتراضي
+            const today = new Date();
+            document.getElementById('gregorian-date').valueAsDate = today;
+            
+            // تحديث التاريخ الهجري واسم اليوم
+            updateHijriDate();
+            updateDayName();
+            
+            // تحديث الإجماليات
+            updateTotals();
+
+            // تحميل البيانات من التخزين المحلي
+            loadFromLocalStorage();
+            // تهيئة خيارات رقم الحظيرة ثم تعيين قيمة تلقائية
+            updateBarnNumberOptions();
+            setAutoBarnNumber();
+            // عرض البيانات في الجدول بعد تهيئة الخيارات
+            loadData();
+            
+            // إضافة مستمعي الأحداث
+            document.getElementById('barn-number').addEventListener('change', updateBarnData);
+            document.getElementById('animal-type').addEventListener('change', updateAnimalTypes);
+            document.getElementById('male-qty').addEventListener('input', updateTotals);
+            document.getElementById('female-qty').addEventListener('input', updateTotals);
+            document.getElementById('unit-price').addEventListener('input', updateTotals);
+            document.getElementById('gregorian-date').addEventListener('change', function() {
+                updateHijriDate();
+                updateDayName();
+            });
+            document.getElementById('male-qty').addEventListener('input', checkCapacity);
+            document.getElementById('female-qty').addEventListener('input', checkCapacity);
+            document.getElementById('capacity').addEventListener('input', checkCapacity);
+            
+            // تعيين أول رقم حظيرة تلقائياً
+            setAutoBarnNumber();
+            
+            // تحديث قائمة أرقام الحظائر المتاحة
+            updateBarnNumberOptions();
+        });
+
+        // تحديث قائمة أرقام الحظائر المتاحة
+        function updateBarnNumberOptions() {
+            const barnNumberSelect = document.getElementById('barn-number');
+            const currentValue = barnNumberSelect.value;
+            
+            // مسح الخيارات الحالية
+            barnNumberSelect.innerHTML = '';
+            
+            // الحصول على الأرقام المستخدمة
+            const usedNumbers = barns.map(barn => barn.barnNumber);
+            
+            // إضافة الخيارات المتاحة
+            for (let i = 1; i <= 20; i++) {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = i.toString();
+                
+                // إذا كان الرقم مستخدمًا، نضيف علامة (مستخدم)
+                if (usedNumbers.includes(i.toString())) {
+                    option.textContent += ' (مستخدم)';
+                    option.disabled = true;
+                }
+                
+                barnNumberSelect.appendChild(option);
+            }
+            
+            // إضافة خيار لإدخال رقم جديد
+            const customOption = document.createElement('option');
+            customOption.value = 'custom';
+            customOption.textContent = 'إدخال رقم جديد...';
+            barnNumberSelect.appendChild(customOption);
+            
+            // استعادة القيمة السابقة إذا كانت لا تزال متاحة
+            if (currentValue && barnNumberSelect.querySelector(`option[value="${currentValue}"]`) && 
+                !barnNumberSelect.querySelector(`option[value="${currentValue}"]`).disabled) {
+                barnNumberSelect.value = currentValue;
+            } else {
+                // تعيين أول رقم متاح
+                setAutoBarnNumber();
+            }
+            
+            // التحقق من حالة الرقم المحدد
+            checkBarnNumberStatus();
+        }
+
+        // التحقق من حالة الرقم المحدد
+        function checkBarnNumberStatus() {
+            const barnNumber = document.getElementById('barn-number').value;
+            const statusElement = document.getElementById('barn-number-status');
+            
+            if (barnNumber === 'custom') {
+                statusElement.textContent = '✎';
+                statusElement.className = 'barn-number-status';
+                return;
+            }
+            
+            // التحقق إذا كان الرقم مستخدمًا
+            const isUsed = barns.some(barn => barn.barnNumber === barnNumber);
+            
+            if (isUsed) {
+                statusElement.textContent = '✗';
+                statusElement.className = 'barn-number-status taken';
+            } else {
+                statusElement.textContent = '✓';
+                statusElement.className = 'barn-number-status available';
+            }
+        }
+
+        // تحديث بيانات الحظيرة بناءً على الرقم المختار
+        function updateBarnData() {
+            const selectedNumber = document.getElementById('barn-number').value;
+            
+            // التحقق من حالة الرقم المحدد
+            checkBarnNumberStatus();
+            
+            // إذا تم اختيار "إدخال رقم جديد"، نتيح للمستخدم إدخال رقم
+            if (selectedNumber === 'custom') {
+                const customNumber = prompt('الرجاء إدخال رقم الحظيرة الجديد:');
+                if (customNumber) {
+                    // التحقق من أن الرقم غير مستخدم
+                    if (barns.some(barn => barn.barnNumber === customNumber)) {
+                        showMessage('رقم الحظيرة هذا مستخدم مسبقاً!', 'error');
+                        setAutoBarnNumber();
+                        return;
+                    }
+                    
+                    // إضافة الخيار الجديد
+                    const barnNumberSelect = document.getElementById('barn-number');
+                    const newOption = document.createElement('option');
+                    newOption.value = customNumber;
+                    newOption.textContent = customNumber;
+                    barnNumberSelect.insertBefore(newOption, barnNumberSelect.lastChild);
+                    barnNumberSelect.value = customNumber;
+                } else {
+                    setAutoBarnNumber();
+                    return;
+                }
+            }
+            
+            // تحديث اسم الحظيرة تلقائياً
+            if (selectedNumber in arabicNumbers) {
+                document.getElementById('barn-name').value = `الحظيرة ${arabicNumbers[selectedNumber]}`;
+            } else {
+                document.getElementById('barn-name').value = `الحظيرة ${selectedNumber}`;
+            }
+            
+            if (barnData[selectedNumber]) {
+                document.getElementById('capacity').value = barnData[selectedNumber].capacity;
+                
+                // تحديث الموقع
+                const locationSelect = document.getElementById('location');
+                for (let i = 0; i < locationSelect.options.length; i++) {
+                    if (locationSelect.options[i].value === barnData[selectedNumber].location) {
+                        locationSelect.selectedIndex = i;
+                        break;
+                    }
+                }
+            } else {
+                // إذا كان الرقم غير موجود في القاموس
+                const barnNum = parseInt(selectedNumber);
+                const capacityValue = (barnNum % 2 === 1) ? 200 : 300;
+                document.getElementById('capacity').value = capacityValue;
+                
+                // تعيين موقع افتراضي
+                const locationIndex = barnNum % 5;
+                document.getElementById('location').selectedIndex = locationIndex;
+            }
+        }
+
+        // تعيين رقم الحظيرة تلقائياً
+        function setAutoBarnNumber() {
+            // حساب الرقم التالي بناءً على الحظائر الموجودة
+            let nextNumber = 1;
+            const usedNumbers = barns.map(barn => parseInt(barn.barnNumber)).filter(num => !isNaN(num));
+            
+            if (usedNumbers.length > 0) {
+                nextNumber = Math.max(...usedNumbers) + 1;
+            }
+            
+            // البحث عن أول رقم متاح
+            while (barns.some(barn => barn.barnNumber === nextNumber.toString())) {
+                nextNumber++;
+            }
+            
+            // تعيين الرقم في القائمة المنسدلة
+            const barnNumberSelect = document.getElementById('barn-number');
+            if (barnNumberSelect.querySelector(`option[value="${nextNumber}"]`) && 
+                !barnNumberSelect.querySelector(`option[value="${nextNumber}"]`).disabled) {
+                barnNumberSelect.value = nextNumber.toString();
+            } else {
+                // إذا كان الرقم غير متاح، نبحث عن أول رقم متاح
+                for (let i = 1; i <= 20; i++) {
+                    const option = barnNumberSelect.querySelector(`option[value="${i}"]`);
+                    if (option && !option.disabled) {
+                        barnNumberSelect.value = i.toString();
+                        break;
+                    }
+                }
+            }
+            
+            // تحديث بيانات الحظيرة بناءً على الرقم الجديد
+            updateBarnData();
+        }
+
+        // تحديث أنواع الحيوانات بناءً على الصنف المختار
+        function updateAnimalTypes() {
+            const selectedAnimal = document.getElementById('animal-type').value;
+            const genderSelect = document.getElementById('gender');
+            
+            // مسح الخيارات الحالية
+            genderSelect.innerHTML = '';
+            
+            // إضافة الخيارات الجديدة
+            if (animalTypesMapping[selectedAnimal]) {
+                animalTypesMapping[selectedAnimal].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    genderSelect.appendChild(option);
+                });
+            }
+        }
+
+        // تحديث الإجماليات تلقائياً
+        function updateTotals() {
+            const maleQty = parseInt(document.getElementById('male-qty').value) || 0;
+            const femaleQty = parseInt(document.getElementById('female-qty').value) || 0;
+            const totalQty = maleQty + femaleQty;
+            
+            document.getElementById('total-quantity').value = totalQty;
+            
+            // حساب إجمالي السعر بناءً على السعر الفردي المدخل
+            const unitPriceText = document.getElementById('unit-price').value.trim();
+            if (unitPriceText) {
+                try {
+                    const unitPrice = parseFloat(unitPriceText.replace(/,/g, ''));
+                    if (!isNaN(unitPrice)) {
+                        const totalPrice = unitPrice * totalQty;
+                        document.getElementById('total-price').value = formatPrice(totalPrice, false);
+                    }
+                } catch (e) {
+                    document.getElementById('total-price').value = '0';
+                }
+            } else {
+                document.getElementById('total-price').value = '0';
+            }
+        }
+
+        // تحديث التاريخ الهجري تلقائياً (مع حماية من تواريخ غير صالحة)
+        function updateHijriDate() {
+            const raw = document.getElementById('gregorian-date').value;
+            if (!raw) {
+                document.getElementById('hijri-date').value = '';
+                return;
+            }
+            const gregorianDate = new Date(raw);
+            if (isNaN(gregorianDate.getTime())) {
+                document.getElementById('hijri-date').value = '';
+                return;
+            }
+            const hijriDate = convertToHijri(gregorianDate);
+            document.getElementById('hijri-date').value = hijriDate;
+        }
+
+        // تحديث اسم اليوم الحالي (مع حماية من تواريخ غير صالحة)
+        function updateDayName() {
+            const raw = document.getElementById('gregorian-date').value;
+            if (!raw) {
+                document.getElementById('day-name').textContent = '';
+                return;
+            }
+            const date = new Date(raw);
+            if (isNaN(date.getTime())) {
+                document.getElementById('day-name').textContent = '';
+                return;
+            }
+            const dayName = getDayNameArabic(date);
+            document.getElementById('day-name').textContent = dayName;
+        }
+
+        // التحقق من تجاوز سعة الحظيرة
+        function checkCapacity() {
+            const maleQty = parseInt(document.getElementById('male-qty').value) || 0;
+            const femaleQty = parseInt(document.getElementById('female-qty').value) || 0;
+            const totalAnimals = maleQty + femaleQty;
+            const capacity = parseInt(document.getElementById('capacity').value) || 0;
+            
+            const alertLabel = document.getElementById('alert-label');
+            
+            if (capacity > 0 && totalAnimals > capacity) {
+                alertLabel.textContent = `⚠️ تنبيه: العدد ${totalAnimals} يتجاوز السعة ${capacity}`;
+                alertLabel.style.display = 'block';
+            } else {
+                alertLabel.style.display = 'none';
+            }
+        }
+
+        // مسح جميع الحقول
+        function clearFields() {
+            selectedId = null;
+            selectedRow = null;
+            
+            // إزالة التحديد من الصف المحدد
+            if (selectedRow) {
+                selectedRow.classList.remove('selected-row');
+            }
+            
+            document.getElementById('barn-number').selectedIndex = 0;
+            document.getElementById('barn-name').value = '';
+            document.getElementById('capacity').value = 0;
+            document.getElementById('animal-type').selectedIndex = 0;
+            document.getElementById('gender').selectedIndex = 0;
+            document.getElementById('location').selectedIndex = 0;
+            document.getElementById('male-qty').value = 0;
+            document.getElementById('female-qty').value = 0;
+            document.getElementById('total-quantity').value = 0;
+            document.getElementById('gregorian-date').valueAsDate = new Date();
+            document.getElementById('supervisor').selectedIndex = 0;
+            document.getElementById('unit-price').value = '';
+            document.getElementById('total-price').value = '';
+            document.getElementById('alert-label').style.display = 'none';
+            
+            updateHijriDate();
+            updateDayName();
+            setAutoBarnNumber();
+            updateAnimalTypes();
+        }
+
+        // حفظ الحظيرة
+        function saveBarn() {
+            const barnNumber = document.getElementById('barn-number').value;
+            
+            // التحقق من صحة البيانات
+            if (!document.getElementById('barn-name').value.trim()) {
+                showMessage('يرجى إدخال اسم الحظيرة.', 'error');
+                return;
+            }
+            
+            if (parseInt(document.getElementById('total-quantity').value) === 0) {
+                showMessage('يرجى إدخال كمية الحيوانات.', 'error');
+                return;
+            }
+            
+            const unitPriceText = document.getElementById('unit-price').value.trim();
+            if (!unitPriceText) {
+                showMessage('يرجى إدخال السعر الفردي.', 'error');
+                return;
+            }
+            
+            let unitPrice;
+            try {
+                unitPrice = parseFloat(unitPriceText.replace(/,/g, ''));
+                if (isNaN(unitPrice) || unitPrice < 0) {
+                    showMessage('السعر الفردي يجب أن يكون رقم موجب.', 'error');
+                    return;
+                }
+            } catch (e) {
+                showMessage('يرجى إدخال سعر فردي صحيح.', 'error');
+                return;
+            }
+            
+            // التحقق من أن رقم الحظيرة غير مكرر (لإضافة جديدة فقط)
+            if (selectedId === null && barns.some(barn => barn.barnNumber === barnNumber)) {
+                showMessage('رقم الحظيرة هذا مستخدم مسبقاً! الرجاء اختيار رقم آخر.', 'error');
+                return;
+            }
+            
+            // التحقق من السعة
+            const totalAnimals = parseInt(document.getElementById('total-quantity').value);
+            const capacity = parseInt(document.getElementById('capacity').value);
+            const alert = (capacity > 0 && totalAnimals > capacity);
+            
+            // حساب إجمالي السعر
+            const totalPrice = unitPrice * totalAnimals;
+            
+            // إنشاء كائن الحظيرة
+            const barn = {
+                barnNumber: barnNumber,
+                barnName: document.getElementById('barn-name').value,
+                capacity: capacity,
+                animalType: document.getElementById('animal-type').value,
+                gender: document.getElementById('gender').value,
+                location: document.getElementById('location').value,
+                maleQty: parseInt(document.getElementById('male-qty').value) || 0,
+                femaleQty: parseInt(document.getElementById('female-qty').value) || 0,
+                totalQuantity: totalAnimals,
+                hijriDate: document.getElementById('hijri-date').value,
+                gregorianDate: document.getElementById('gregorian-date').value,
+                supervisor: document.getElementById('supervisor').value,
+                unitPrice: unitPrice,
+                totalPrice: totalPrice,
+                alert: alert,
+                addedDate: new Date().toISOString()
+            };
+            
+            // عرض مؤشر التحميل
+            showLoading(true);
+            
+            // محاكاة عملية الحفظ (في التطبيق الحقيقي قد تكون هذه عملية غير متزامنة)
+            setTimeout(() => {
+                // حفظ البيانات
+                if (selectedId !== null) {
+                    // تحديث الحظيرة الحالية
+                    barns[selectedId] = barn;
+                    showMessage('تم تحديث الحظيرة بنجاح!', 'success');
+                } else {
+                    // إضافة حظيرة جديدة
+                    barn.id = Date.now().toString(); // استخدام الطابع الزمني كمعرف فريد
+                    barns.push(barn);
+                    showMessage('تم إضافة الحظيرة بنجاح!', 'success');
+                }
+                
+                // حفظ البيانات في التخزين المحلي
+                saveToLocalStorage();
+                
+                // تحديث قائمة أرقام الحظائر المتاحة
+                updateBarnNumberOptions();
+                
+                // إعادة تعيين الحقول وتحديث الجدول
+                clearFields();
+                loadData();
+                
+                // إخفاء مؤشر التحميل
+                showLoading(false);
+            }, 500); // محاكاة تأخير قدره 500 مللي ثانية
+        }
+
+        // حذف الحظيرة
+        function deleteBarn() {
+            if (selectedId === null) {
+                showMessage('يرجى اختيار حظيرة أولاً.', 'error');
+                return;
+            }
+            
+            if (confirm('هل تريد حذف الحظيرة المحددة؟')) {
+                showLoading(true);
+                
+                setTimeout(() => {
+                    barns.splice(selectedId, 1);
+                    saveToLocalStorage();
+                    showMessage('تم حذف الحظيرة بنجاح!', 'success');
+                    
+                    // تحديث قائمة أرقام الحظائر المتاحة
+                    updateBarnNumberOptions();
+                    
+                    clearFields();
+                    loadData();
+                    showLoading(false);
+                }, 500);
+            }
+        }
+
+        // تحميل البيانات في الجدول
+        function loadData() {
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+            
+            // تحديث الإحصائيات
+            updateStatistics();
+            // جلب بيانات الأغنام لحساب الأعداد الحقيقية
+            const sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            
+            // عرض البيانات في الجدول
+            barns.forEach((barn, index) => {
+                const row = document.createElement('tr');
+                row.onclick = () => loadSelectedRow(index, row);
+                
+                // تعبئة البيانات في الجدول
+                // حساب الأعداد من sheepData (احتساب الحقيقية المستخدمة)
+                const barnKey = barn.barnNumber || barn.barnNum || barn.barnId || barn.barn_id || barn.barn;
+                const barnSheep = sheepData.filter(s => String(s.barnNumber) === String(barnKey) || String(s.barnNumber) === String(barn.barnNumber));
+                let maleCount = 0;
+                let femaleCount = 0;
+                let totalCount = 0;
+                barnSheep.forEach(s => {
+                    const rep = parseInt(s.repeat) || 1;
+                    totalCount += rep;
+                    if (s.gender === 'ذكر') maleCount += rep;
+                    else if (s.gender === 'أنثى') femaleCount += rep;
+                });
+
+                // إذا لم تتوفر بيانات الأغنام، نستخدم القيم المخزنة في الحظيرة كـ fallback
+                const displayMale = (maleCount > 0) ? maleCount : (barn.maleQty || barn.maleCount || 0);
+                const displayFemale = (femaleCount > 0) ? femaleCount : (barn.femaleQty || barn.femaleCount || 0);
+                const displayTotal = (totalCount > 0) ? totalCount : (barn.totalQuantity || barn.total || 0);
+
+                const columnsData = [
+                    barn.barnNumber || '',
+                    barn.barnName || '',
+                    formatDate(barn.gregorianDate),
+                    barn.capacity || '0',
+                    barn.animalType || '',
+                    getDayMonth(barn.gregorianDate),
+                    barn.gender || '',
+                    barn.location || '',
+                    displayMale,
+                    displayFemale,
+                    displayTotal,
+                    formatPrice(barn.unitPrice),
+                    formatPrice(barn.totalPrice)
+                ];
+                
+                columnsData.forEach((data, colIndex) => {
+                    const cell = document.createElement('td');
+                    cell.textContent = data;
+                    
+                    // تلوين الأعمدة العددية
+                    if (colIndex === 3 || colIndex === 8 || colIndex === 9 || colIndex === 10) {
+                        cell.style.backgroundColor = '#f0f0f0';
+                    }
+                    
+                    row.appendChild(cell);
+                });
+                
+                tableBody.appendChild(row);
+            });
+            
+            // تحديث عدد الصفوف المعروضة
+            updateRowCount();
+        }
+
+        // تحديث عدد الصفوف المعروضة
+        function updateRowCount() {
+            const rowCount = barns.length;
+            document.getElementById('row-count').textContent = `عدد الصفوف: ${rowCount}`;
+        }
+
+        // تحميل بيانات الصف المحدد في الحقول
+        function loadSelectedRow(index, rowElement) {
+            const barn = barns[index];
+            selectedId = index;
+            
+            // إزالة التحديد من الصف السابق
+            if (selectedRow) {
+                selectedRow.classList.remove('selected-row');
+            }
+            
+            // إضافة التحديد للصف الجديد
+            selectedRow = rowElement;
+            selectedRow.classList.add('selected-row');
+            
+            // تعبئة الحقول من البيانات
+            document.getElementById('barn-number').value = barn.barnNumber;
+            document.getElementById('barn-name').value = barn.barnName;
+            document.getElementById('capacity').value = barn.capacity || 0;
+            document.getElementById('animal-type').value = barn.animalType;
+            document.getElementById('gender').value = barn.gender;
+            document.getElementById('location').value = barn.location;
+            document.getElementById('male-qty').value = barn.maleQty || 0;
+            document.getElementById('female-qty').value = barn.femaleQty || 0;
+            document.getElementById('total-quantity').value = barn.totalQuantity || 0;
+            document.getElementById('hijri-date').value = barn.hijriDate;
+            document.getElementById('gregorian-date').value = barn.gregorianDate;
+            document.getElementById('supervisor').value = barn.supervisor;
+            document.getElementById('unit-price').value = formatPrice(barn.unitPrice, false);
+            document.getElementById('total-price').value = formatPrice(barn.totalPrice, false);
+            
+            // تحديث التاريخ الهجري واسم اليوم
+            updateHijriDate();
+            updateDayName();
+            
+            // التحقق من السعة
+            checkCapacity();
+            
+            // تحديث حالة رقم الحظيرة
+            checkBarnNumberStatus();
+        }
+
+        // تحديث الإحصائيات
+        function updateStatistics() {
+            const totalBarns = barns.length;
+
+            // حساب إجمالي الحيوانات اعتماداً على بيانات الأغنام (sheepData) إذا وجدت
+            const sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+            let totalAnimals = 0;
+            sheepData.forEach(s => {
+                totalAnimals += parseInt(s.repeat) || 1;
+            });
+
+            // كاحتياط، نستخدم القيم المخزنة في المجمل إن لم توجد بيانات الأغنام
+            if (totalAnimals === 0) {
+                totalAnimals = barns.reduce((sum, barn) => sum + (barn.totalQuantity || 0), 0);
+            }
+
+            document.getElementById('total-barns').textContent = `عدد الحظائر: ${totalBarns}`;
+            document.getElementById('total-animals').textContent = `إجمالي الحيوانات: ${totalAnimals}`;
+        }
+
+        // تنسيق التاريخ
+        function formatDate(dateValue) {
+            if (!dateValue) return '';
+            try {
+                const date = new Date(dateValue);
+                return date.toISOString().split('T')[0];
+            } catch (e) {
+                return String(dateValue);
+            }
+        }
+
+        // تنسيق السعر
+        function formatPrice(priceValue, withCurrency = true) {
+            if (priceValue === null || priceValue === undefined) {
+                return withCurrency ? '0 ريال' : '0';
+            }
+            
+            try {
+                const num = parseFloat(priceValue);
+                if (isNaN(num)) return withCurrency ? '0 ريال' : '0';
+                
+                let s = num.toFixed(2);
+                s = s.replace(/\.?0+$/, '');
+                
+                return withCurrency ? `${s} ريال` : s;
+            } catch (e) {
+                return withCurrency ? '0 ريال' : '0';
+            }
+        }
+
+        // الحصول على اليوم والشهر من التاريخ
+        function getDayMonth(dateValue) {
+            if (!dateValue) return '';
+            try {
+                const date = new Date(dateValue);
+                return `${date.getDate()}/${date.getMonth() + 1}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // الحصول على اسم اليوم باللغة العربية
+        function getDayNameArabic(date) {
+            const days = [
+                "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", 
+                "الخميس", "الجمعة", "السبت"
+            ];
+            return days[date.getDay()];
+        }
+
+        // تحويل التاريخ الميلادي إلى هجري (محاكاة)
+        function convertToHijri(gregorianDate) {
+            // هذه دالة محاكاة، في التطبيق الحقيقي يمكن استخدام مكتبة تحويل التواريخ
+            const year = gregorianDate.getFullYear();
+            const month = gregorianDate.getMonth() + 1;
+            const day = gregorianDate.getDate();
+            
+            // حساب تقريبي (ليس دقيقاً)
+            const hijriYear = Math.round((year - 622) * (33/32));
+            const hijriMonth = month;
+            const hijriDay = day;
+            
+            return `${hijriYear}/${hijriMonth.toString().padStart(2, '0')}/${hijriDay.toString().padStart(2, '0')}`;
+        }
+
+        // حفظ البيانات في التخزين المحلي
+        function saveToLocalStorage() {
+            localStorage.setItem('barnsData', JSON.stringify(barns));
+        }
+
+        // تحميل البيانات من التخزين المحلي
+        function loadFromLocalStorage() {
+            const savedData = localStorage.getItem('barnsData');
+            if (savedData) {
+                barns = JSON.parse(savedData);
+            }
+        }
+
+        // عرض رسالة
+        function showMessage(message, type) {
+            const successElement = document.getElementById('success-message');
+            const errorElement = document.getElementById('error-message');
+            
+            if (type === 'success') {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                errorElement.style.display = 'none';
+            } else if (type === 'error') {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                successElement.style.display = 'none';
+            }
+            
+            // إخفاء الرسالة بعد 3 ثوانٍ
+            setTimeout(() => {
+                successElement.style.display = 'none';
+                errorElement.style.display = 'none';
+            }, 3000);
+        }
+
+        // عرض/إخفاء مؤشر التحميل
+        function showLoading(show) {
+            const loadingElement = document.getElementById('loading');
+            loadingElement.style.display = show ? 'block' : 'none';
+        }
+
+        // الرجوع للقائمة الرئيسية — استخدم history.back() مع تراجع احتياطي
+        function goBack() {
+            if (!confirm('هل تريد الرجوع للقائمة الرئيسية؟')) return;
+            try {
+                if (history.length > 1) {
+                    history.back();
+                    setTimeout(() => { window.location.href = '../index.html'; }, 300);
+                } else {
+                    window.location.href = '../index.html';
+                }
+            } catch (err) {
+                window.location.href = '../index.html';
+            }
+        }
+    </script>
+</body>
+</html>

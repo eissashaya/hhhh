@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>👶 حركة المواليد - صفحة تجريبية</title>
+  <style>body{font-family: 'Noto Sans Arabic', sans-serif;direction:rtl;padding:20px;background:#f7f7ff} .card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 4px 14px rgba(0,0,0,0.06)} a.btn{display:inline-block;margin-top:12px;padding:10px 14px;background:#5c6bc0;color:#fff;border-radius:10px;text-decoration:none}</style>
+</head>
+<body>
+  <div class="card">
+    <h1>👶 حركة المواليد</h1>
+    <p>هذه صفحة تجريبية لعرض وتتبع حركة المواليد. استبدل المحتوى لاحقًا بالمكونات الفعلية.</p>
+    <a class="btn" href="#" onclick="goBack(event)">◀ العودة إلى القائمة الرئيسية</a>
+  </div>
+  <script>
+    function goBack(e) {
+      e.preventDefault();
+      try {
+        if (history.length > 1) {
+          history.back();
+          setTimeout(() => { window.location.href = '../index.html'; }, 300);
+        } else {
+          window.location.href = '../index.html';
+        }
+      } catch (err) {
+        window.location.href = '../index.html';
+      }
+    }
+  </script>
+</body>
+</html>
