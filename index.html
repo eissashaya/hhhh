@@ -735,15 +735,157 @@
             document.getElementById('userGreeting').textContent = `${greeting} | 👤 المستخدم`;
         }
 
-        // تحديث الإحصائيات
+        // حساب إجمالي الأغنام من جميع الحظائر
+        function calculateTotalSheep() {
+            try {
+                // جلب بيانات الأغنام من localStorage
+                const sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+                
+                // حساب إجمالي الأغنام من خلال جمع التكرارات (repeat) لكل سجل
+                let totalSheepCount = 0;
+                sheepData.forEach(sheep => {
+                    totalSheepCount += parseInt(sheep.repeat) || 1;
+                });
+                
+                // تحديث العنصر في واجهة المستخدم
+                document.getElementById('totalSheep').textContent = totalSheepCount;
+                
+                return totalSheepCount;
+            } catch (error) {
+                console.error('خطأ في حساب إجمالي الأغنام:', error);
+                document.getElementById('totalSheep').textContent = '0';
+                return 0;
+            }
+        }
+
+        // تحديث الإحصائيات (اقرأ بيانات المواليد الحقيقية من localStorage)
         function updateStatistics() {
-            // بيانات عشوائية للإحصائيات
-            document.getElementById('totalSheep').textContent = Math.floor(Math.random() * 1000) + 500;
-            document.getElementById('readyBabies').textContent = Math.floor(Math.random() * 100) + 50;
-            document.getElementById('deadBabies').textContent = Math.floor(Math.random() * 20);
-            document.getElementById('soldBabies').textContent = Math.floor(Math.random() * 200) + 100;
-            document.getElementById('presentBabies').textContent = Math.floor(Math.random() * 150) + 50;
-            document.getElementById('missingBabies').textContent = Math.floor(Math.random() * 10);
+            // حساب إجمالي الأغنام من البيانات الفعلية
+            const totalSheepCount = calculateTotalSheep();
+
+            // جلب بيانات المواليد من التخزين المحلي
+            const newborns = JSON.parse(localStorage.getItem('newborns')) || [];
+
+            // حساب الحالات الحقيقية
+            const ready = newborns.filter(n => n.status === 'جاهز').length;
+            const dead = newborns.filter(n => n.status === 'نافق' || n.status === 'ميت').length;
+            const sold = newborns.filter(n => n.status === 'مباع').length;
+            const present = newborns.filter(n => n.status === 'موجود' || n.status === 'حي').length;
+            const missing = newborns.filter(n => n.status === 'مفقود').length;
+
+            // عرض القيم في الواجهة
+            document.getElementById('readyBabies').textContent = ready;
+            document.getElementById('deadBabies').textContent = dead;
+            document.getElementById('soldBabies').textContent = sold;
+            document.getElementById('presentBabies').textContent = present;
+            document.getElementById('missingBabies').textContent = missing;
+
+            // إضافة حدث النقر لإظهار تفاصيل الإجمالي كما كان
+            const totalCard = document.getElementById('totalSheep').parentElement;
+            if (totalCard) {
+                totalCard.onclick = function() {
+                    showTotalSheepDetails();
+                };
+            }
+        }
+
+        // عرض تفاصيل إجمالي الأغنام
+        function showTotalSheepDetails() {
+            try {
+                // جلب بيانات الأغنام من localStorage
+                const sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
+                
+                if (sheepData.length === 0) {
+                    alert('لا توجد بيانات أغنام مسجلة في النظام.');
+                    return;
+                }
+                
+                // إنشاء نافذة حوار مخصصة لعرض تفاصيل الأغنام
+                const dialog = document.createElement('div');
+                dialog.className = 'dialog';
+                dialog.style.display = 'flex';
+                dialog.innerHTML = `
+                    <div class="dialog-content" style="max-width: 900px;">
+                        <div class="dialog-header">
+                            <div class="dialog-title">🐑 تفاصيل إجمالي الأغنام</div>
+                            <button class="dialog-close" onclick="this.parentElement.parentElement.parentElement.remove()">✕</button>
+                        </div>
+                        <div class="dialog-body">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>كود الأم</th>
+                                        <th>رقم الحظيرة</th>
+                                        <th>النوع</th>
+                                        <th>الصنف</th>
+                                        <th>الجنس</th>
+                                        <th>التكرار</th>
+                                        <th>التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="totalSheepTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="dialog-footer">
+                            <button class="btn" onclick="exportTotalSheepData()">📊 تصدير البيانات</button>
+                            <button class="btn" onclick="printTotalSheepReport()">🖨️ طباعة التقرير</button>
+                            <button class="btn" onclick="this.parentElement.parentElement.parentElement.remove()">❌ إغلاق</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(dialog);
+                
+                // ملء الجدول بالبيانات
+                const tableBody = dialog.querySelector('#totalSheepTableBody');
+                tableBody.innerHTML = '';
+                
+                let totalCount = 0;
+                sheepData.forEach(sheep => {
+                    const row = document.createElement('tr');
+                    const repeat = parseInt(sheep.repeat) || 1;
+                    totalCount += repeat;
+                    
+                    row.innerHTML = `
+                        <td>${sheep.motherCode || '-'}</td>
+                        <td>${sheep.barnNumber || '-'}</td>
+                        <td>${sheep.type || '-'}</td>
+                        <td>${sheep.breed || '-'}</td>
+                        <td>${sheep.gender || '-'}</td>
+                        <td>${repeat}</td>
+                        <td>${sheep.purchaseDate || '-'}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // إضافة صف الإجمالي
+                const totalRow = document.createElement('tr');
+                totalRow.style.fontWeight = 'bold';
+                totalRow.style.background = 'rgba(30, 136, 229, 0.1)';
+                totalRow.innerHTML = `
+                    <td colspan="5" style="text-align: left;">الإجمالي</td>
+                    <td>${totalCount}</td>
+                    <td></td>
+                `;
+                tableBody.appendChild(totalRow);
+                
+            } catch (error) {
+                console.error('خطأ في عرض تفاصيل الأغنام:', error);
+                alert('حدث خطأ في عرض تفاصيل الأغنام.');
+            }
+        }
+
+        // تصدير بيانات إجمالي الأغنام
+        function exportTotalSheepData() {
+            alert('سيتم تصدير بيانات إجمالي الأغنام.');
+            // يمكن تنفيذ وظيفة التصدير الفعلية هنا
+        }
+
+        // طباعة تقرير إجمالي الأغنام
+        function printTotalSheepReport() {
+            alert('سيتم فتح نافذة الطباعة لتقرير إجمالي الأغنام.');
+            // يمكن تنفيذ وظيفة الطباعة الفعلية هنا
         }
 
         // فتح وإغلاق النوافذ
@@ -759,20 +901,56 @@
         function showTwinSheep() {
             const tableBody = document.getElementById('twinSheepTable');
             tableBody.innerHTML = '';
-            
-            sampleTwinSheepData.forEach(sheep => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${sheep.code}</td>
-                    <td>${sheep.mother}</td>
-                    <td>${sheep.type}</td>
-                    <td>${sheep.twin}</td>
-                    <td>${sheep.status}</td>
-                    <td>${sheep.date}</td>
-                `;
-                tableBody.appendChild(row);
+
+            // جلب المواليد من التخزين المحلي
+            const newborns = JSON.parse(localStorage.getItem('newborns')) || [];
+
+            // فلترة المواليد التي هي توأم (قيمة 'نعم')
+            const twins = newborns.filter(n => {
+                try { return String(n.twin).trim() === 'نعم'; } catch (e) { return false; }
             });
-            
+
+            if (twins.length > 0) {
+                twins.forEach(nb => {
+                    const row = document.createElement('tr');
+                    const code = nb.newbornCode || nb.code || '';
+                    // عرض جزء كود الأم إذا وُجد مثل 'm001' أو كليته
+                    let mother = nb.motherCode || nb.mother || '';
+                    try {
+                        const m = String(mother).match(/-(?:m|f|M|F)\d+$/i);
+                        if (m) mother = m[0].replace(/^-/, '');
+                    } catch (e) {}
+
+                    const type = nb.gender || nb.type || '';
+                    const status = nb.status || '';
+                    const date = nb.birthDate || nb.date || (nb.addedDate ? new Date(nb.addedDate).toLocaleDateString('ar-EG') : '');
+
+                    row.innerHTML = `
+                        <td>${code}</td>
+                        <td>${mother}</td>
+                        <td>${type}</td>
+                        <td>نعم</td>
+                        <td>${status}</td>
+                        <td>${date}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                // fallback: استخدم بيانات العيّنة إذا لم توجد بيانات حقيقية
+                sampleTwinSheepData.forEach(sheep => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sheep.code}</td>
+                        <td>${sheep.mother}</td>
+                        <td>${sheep.type}</td>
+                        <td>${sheep.twin}</td>
+                        <td>${sheep.status}</td>
+                        <td>${sheep.date}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
             openDialog('twinSheepDialog');
         }
 
@@ -780,20 +958,55 @@
         function showSingleBirthSheep() {
             const tableBody = document.getElementById('singleBirthTable');
             tableBody.innerHTML = '';
-            
-            sampleSingleBirthData.forEach(sheep => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${sheep.code}</td>
-                    <td>${sheep.mother}</td>
-                    <td>${sheep.type}</td>
-                    <td>${sheep.twin}</td>
-                    <td>${sheep.status}</td>
-                    <td>${sheep.date}</td>
-                `;
-                tableBody.appendChild(row);
+
+            // جلب المواليد من التخزين المحلي
+            const newborns = JSON.parse(localStorage.getItem('newborns')) || [];
+
+            // فلترة المواليد التي ليست توأم (قيمة 'لا')
+            const singles = newborns.filter(n => {
+                try { return String(n.twin).trim() === 'لا'; } catch (e) { return false; }
             });
-            
+
+            if (singles.length > 0) {
+                singles.forEach(nb => {
+                    const row = document.createElement('tr');
+                    const code = nb.newbornCode || nb.code || '';
+                    let mother = nb.motherCode || nb.mother || '';
+                    try {
+                        const m = String(mother).match(/-(?:m|f|M|F)\d+$/i);
+                        if (m) mother = m[0].replace(/^-/, '');
+                    } catch (e) {}
+
+                    const type = nb.gender || nb.type || '';
+                    const status = nb.status || '';
+                    const date = nb.birthDate || nb.date || (nb.addedDate ? new Date(nb.addedDate).toLocaleDateString('ar-EG') : '');
+
+                    row.innerHTML = `
+                        <td>${code}</td>
+                        <td>${mother}</td>
+                        <td>${type}</td>
+                        <td>لا</td>
+                        <td>${status}</td>
+                        <td>${date}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } else {
+                // fallback to sample data
+                sampleSingleBirthData.forEach(sheep => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${sheep.code}</td>
+                        <td>${sheep.mother}</td>
+                        <td>${sheep.type}</td>
+                        <td>${sheep.twin}</td>
+                        <td>${sheep.status}</td>
+                        <td>${sheep.date}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
             openDialog('singleBirthDialog');
         }
 
@@ -833,7 +1046,8 @@
 
         // وظائف التنقل
         function goHome() {
-            alert('العودة إلى الصفحة الرئيسية');
+            // إعادة تحميل الصفحة للتأكد من تحديث البيانات
+            location.reload();
         }
 
         function logout() {
@@ -878,6 +1092,9 @@
             
             // تحديث الإحصائيات كل 30 ثانية فقط
             setInterval(updateStatistics, 30000);
+            
+            // تحديث الوقت كل ثانية
+            setInterval(updateDateTime, 1000);
         };
     </script>
 </body>

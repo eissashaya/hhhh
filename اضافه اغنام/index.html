@@ -1066,15 +1066,12 @@
                         // تنسيق كود الحظيرة
                         const barnCode = sheep.barnNumber.toString().padStart(3, '0');
 
-                        // تنسيق كود الأم (نُظهر اللاحقة M/F مع الرقم إذا وُجد)
+                        // تنسيق كود الأم: نحفظ ونعرض الآن كـ mNNNN أو fNNNN (حرف واحد + 4 خانات)
                         let motherDisplay = sheep.motherCode || '';
                         try {
-                            const match = String(sheep.motherCode).match(/-([MF])(\d+)$/i);
-                            if (match) {
-                                motherDisplay = `${match[1].toUpperCase()}${match[2].padStart(3, '0')}`;
-                            }
+                            motherDisplay = String(motherDisplay).toLowerCase();
                         } catch (e) {
-                            // نترك القيمة كما هي عند الخطأ
+                            motherDisplay = String(motherDisplay || '').toLowerCase();
                         }
 
                         row.innerHTML = `
@@ -1299,34 +1296,44 @@
             };
         }
 
-        // توليد كود أم جديد
+        // توليد كود أم جديد - تم التصحيح لمنع التكرار
         function generateNewCode() {
             if (!currentBarnNumber) return;
-            
-            // توليد كود أم (رقم تسلسلي)
+
             const barnCode = currentBarnNumber.toString().padStart(3, '0');
-            
-            // البحث عن آخر كود أم في هذه الحظيرة
+
+            // البحث عن جميع أكواد الأمهات في هذه الحظيرة
+            sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
             const barnSheep = sheepData.filter(sheep => String(sheep.barnNumber) == String(currentBarnNumber));
-            let maxSeq = 0;
-            
+            // استخراج جميع الأرقام التسلسلية النهائية (4 خانات) من الأكواد الموجودة للحظيرة
+            const allSequenceNumbers = [];
             barnSheep.forEach(sheep => {
-                try {
-                    const match = sheep.motherCode.match(/-(\d+)-/);
+                if (sheep.motherCode) {
+                    // نمط الكود الجديد: mNNNN أو fNNNN
+                    const match = String(sheep.motherCode).match(/^([mf])(\d{4})$/i);
                     if (match) {
-                        const seq = parseInt(match[1]);
-                        if (seq > maxSeq) maxSeq = seq;
+                        const finalSeq = parseInt(match[2]);
+                        if (!isNaN(finalSeq)) allSequenceNumbers.push(finalSeq);
                     }
-                } catch (e) {
-                    // تجاهل الأخطاء
                 }
             });
-            
-            const nextSeq = (maxSeq + 1).toString().padStart(4, '0');
-            motherBaseFull = `${barnCode}-${nextSeq}`;
-            
-            // عرض الجزء الرقمي فقط
-            document.getElementById('mother-code').value = nextSeq;
+
+            // تحديد أكبر رقم تسلسلي
+            let maxSeq = 0;
+            if (allSequenceNumbers.length > 0) {
+                maxSeq = Math.max(...allSequenceNumbers);
+            }
+
+            // الرقم التسلسلي التالي (نستخدم 4 خانات نهائية)
+            // إذا لم توجد أي سجلات سابقة نبدأ من 1 => m0001
+            const nextSeq = (allSequenceNumbers.length === 0) ? 1 : (maxSeq + 1);
+            const finalPart = nextSeq.toString().padStart(4, '0');
+
+            // لا نستخدم البنية القديمة (barn-middle) بعد الآن للـ motherBaseFull
+            motherBaseFull = null;
+
+            // عرض الكود بصيغة mNNNN للمستخدم (نستخدم الحرف m افتراضياً)
+            document.getElementById('mother-code').value = `m${finalPart}`;
         }
 
         // حفظ الكمية
@@ -1425,27 +1432,6 @@
                     }
                 }, 100);
             });
-            return;
-
-            // بدء المعالجة
-            isProcessing = true;
-            document.getElementById('progress-container').style.display = 'block';
-            document.getElementById('save-btn').disabled = true;
-
-            // محاكاة المعالجة التدريجية
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 5;
-                if (progress > 100) progress = 100;
-
-                document.getElementById('progress-fill').style.width = `${progress}%`;
-                document.getElementById('progress-text').textContent = `${progress}%`;
-
-                if (progress === 100) {
-                    clearInterval(progressInterval);
-                    completeSaveProcess(maleToAdd, femaleToAdd);
-                }
-            }, 100);
         }
 
         // إكمال عملية الحفظ
@@ -1453,8 +1439,12 @@
             try {
                 // تحديث بيانات الأغنام الحالية ثم توليد كود أم جديد لضمان تسلسل صحيح
                 sheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
-                generateNewCode();
-
+                
+                // تأكد من وجود motherBaseFull
+                if (!motherBaseFull) {
+                    generateNewCode();
+                }
+                
                 const purchaseDate = document.getElementById('modal-purchase-date-input').value;
                 const breed = document.getElementById('modal-breed').value;
                 const type = document.getElementById('modal-type').value;
@@ -1464,11 +1454,50 @@
                 // حفظ البيانات في جدول الأغنام فقط
                 const newSheepData = [];
                 
-                // إضافة الذكور
+                // نحسب تسلسلات منفصلة لكل جنس داخل الحظيرة الحالية
+                const maleSeqs = [];
+                const femaleSeqs = [];
+                const existingSheep = JSON.parse(localStorage.getItem('sheepData')) || [];
+                existingSheep.forEach(s => {
+                    try {
+                        if (String(s.barnNumber) === String(currentBarnNumber) && s.motherCode) {
+                            const mc = String(s.motherCode).trim();
+                            // نمط الكود الجديد: mNNNN أو fNNNN
+                            const match = mc.match(/^([mf])(\d{4})$/i);
+                            if (match) {
+                                const g = match[1].toLowerCase();
+                                const num = parseInt(match[2]);
+                                if (!isNaN(num)) {
+                                    if (g === 'm') maleSeqs.push(num);
+                                    else if (g === 'f') femaleSeqs.push(num);
+                                }
+                            }
+                        }
+                    } catch (e) { /* ignore parse errors */ }
+                });
+
+                let maxMale = 0; let maxFemale = 0;
+                if (maleSeqs.length > 0) maxMale = Math.max(...maleSeqs);
+                if (femaleSeqs.length > 0) maxFemale = Math.max(...femaleSeqs);
+
+                // نبدأ العد لكل جنس من الرقم التالي الخاص به
+                // إذا لم تكن هناك سجلات سابقة نريد أن يكون أول كود m0001 / f0001
+                let seqCounterMale = (maleSeqs.length === 0) ? 0 : maxMale;
+                let seqCounterFemale = (femaleSeqs.length === 0) ? 0 : maxFemale;
+
+                // دالة لبناء كود الأم الجديد بصيغة mNNNN أو fNNNN (4 خانات)
+                const makeMotherCode = (seq, genderChar) => {
+                    const final = seq.toString().padStart(4, '0');
+                    return `${genderChar}${final}`;
+                };
+
+                // إضافة الذكور: استخدام عداد الذكور
                 for (let i = 0; i < maleCount; i++) {
+                    seqCounterMale += 1;
+                    const motherCode = makeMotherCode(seqCounterMale, 'm');
                     newSheepData.push({
                         barnNumber: currentBarnNumber,
-                        motherCode: `${motherBaseFull}-M${(i+1).toString().padStart(3, '0')}`,
+                        motherCode: motherCode,
                         type: type,
                         breed: breed,
                         gender: 'ذكر',
@@ -1478,12 +1507,14 @@
                         repeat: 1
                     });
                 }
-                
-                // إضافة الإناث
+
+                // إضافة الإناث: استخدام عداد الإناث
                 for (let i = 0; i < femaleCount; i++) {
+                    seqCounterFemale += 1;
+                    const motherCode = makeMotherCode(seqCounterFemale, 'f');
                     newSheepData.push({
                         barnNumber: currentBarnNumber,
-                        motherCode: `${motherBaseFull}-F${(i+1).toString().padStart(3, '0')}`,
+                        motherCode: motherCode,
                         type: type,
                         breed: breed,
                         gender: 'أنثى',
@@ -1496,8 +1527,6 @@
                 
                 // حفظ البيانات في قاعدة البيانات
                 const existingSheepData = JSON.parse(localStorage.getItem('sheepData')) || [];
-                // قبل الدمج: تحديث motherBaseFull ليكون تتابعيًا إذا أضفنا مجموعات متعددة متعاقبة
-                // (نستخدم motherBaseFull كأساس، وأرقام M/F تتزايد داخل كل مجموعة)
                 const updatedSheepData = [...existingSheepData, ...newSheepData];
                 localStorage.setItem('sheepData', JSON.stringify(updatedSheepData));
                 
@@ -1510,7 +1539,7 @@
                 loadBarnDetails(currentBarnNumber); // إعادة تحميل بيانات الحظيرة (لن تتغير)
                 loadSheepTable(currentBarnNumber); // تحديث جدول الأغنام والملخص
                 
-                showMessage(`تم إضافة ${newSheepData.length} غنم بنجاح!\nالذكور: ${maleCount}\nالإناث: ${femaleCount}\nكود الأم: ${motherBaseFull}`, 'success');
+                showMessage(`تم إضافة ${newSheepData.length} غنم بنجاح!\nالذكور: ${maleCount}\nالإناث: ${femaleCount}`, 'success');
             } catch (error) {
                 showMessage(`حدث خطأ أثناء الحفظ: ${error.message}`, 'error');
                 isProcessing = false;
